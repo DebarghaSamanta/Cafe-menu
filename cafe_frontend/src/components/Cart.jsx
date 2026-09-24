@@ -68,7 +68,15 @@ function Cart({
 
                 <div className="cart-item-info">
                   <h3>{item.name}</h3>
-
+                {item.customizations?.length > 0 && (
+                    <p className="cart-item-customizations">
+                      {item.customizations
+                        .flatMap((group) =>
+                          group.choices.map((choice) => choice.label)
+                        )
+                        .join(", ")}
+                    </p>
+                  )}
                   <p>
                     ₹
                     {formatPrice(
@@ -87,7 +95,7 @@ function Cart({
                     type="button"
                     className="remove-item-button"
                     onClick={() =>
-                      onRemove(item.id)
+                      onRemove(item.lineId)
                     }
                   >
                     Remove
@@ -102,7 +110,7 @@ function Cart({
                     <button
                       type="button"
                       onClick={() =>
-                        onDecrease(item.id)
+                        onDecrease(item.lineId)
                       }
                       disabled={
                         item.quantity <= 1
@@ -119,7 +127,7 @@ function Cart({
                     <button
                       type="button"
                       onClick={() =>
-                        onIncrease(item.id)
+                        onIncrease(item.lineId)
                       }
                       disabled={
                         item.quantity >=

@@ -16,7 +16,9 @@ from app.schemas.models import (
 from app.services.table_resolution import (
     resolve_table_from_token,
 )
-
+from app.services.customization import (
+    price_delta_for_customizations,
+)
 
 router = APIRouter(
     prefix="/api/orders",
@@ -75,35 +77,42 @@ def create_order(
     # 2. Merge duplicate menu item IDs
     # =====================================================
 
-    requested_quantities: dict[str, int] = {}
-
-    for item in payload.items:
-        current_quantity = (
-            requested_quantities.get(
-                item.menu_item_id,
-                0,
+    def customization_signature(customizations) -> tuple:
+        return tuple(
+            sorted(
+                (c.group_id, tuple(sorted(c.choice_ids)))
+                for c in customizations
             )
         )
 
-        new_quantity = (
-            current_quantity +
-            item.quantity
+    order_lines: dict[tuple, dict] = {}
+
+    for item in payload.items:
+        line_key = (
+            item.menu_item_id,
+            customization_signature(item.customizations),
         )
+
+        existing_line = order_lines.get(line_key)
+        current_quantity = existing_line["quantity"] if existing_line else 0
+        new_quantity = current_quantity + item.quantity
 
         if new_quantity > 10:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=(
-                    f"Maximum quantity for one menu "
-                    f"item is 10: {item.menu_item_id}"
+                    f"Maximum quantity for one menu item "
+                    f"configuration is 10: {item.menu_item_id}"
                 ),
             )
 
-        requested_quantities[
-            item.menu_item_id
-        ] = new_quantity
+        order_lines[line_key] = {
+            "menu_item_id": item.menu_item_id,
+            "customizations": item.customizations,
+            "quantity": new_quantity,
+        }
 
-    if not requested_quantities:
+    if not order_lines:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Order must contain at least one item",
@@ -112,11 +121,9 @@ def create_order(
     # =====================================================
     # 3. Fetch latest menu data
     # =====================================================
-
     menu_item_ids = list(
-        requested_quantities.keys()
+        {line["menu_item_id"] for line in order_lines.values()}
     )
-
     menu_documents = list(
         db.menu_items.find(
             {
@@ -130,15 +137,14 @@ def create_order(
                 "category": 1,
                 "price_paise": 1,
                 "is_available": 1,
+                "customization_groups": 1,
             },
         )
     )
-
     menu_by_id = {
         str(document["_id"]): document
         for document in menu_documents
     }
-
     # =====================================================
     # 4. Check whether every requested item exists
     # =====================================================
@@ -200,21 +206,17 @@ def create_order(
     order_items = []
     total_paise = 0
 
-    for item_id in menu_item_ids:
+    for line in order_lines.values():
+        item_id = line["menu_item_id"]
         document = menu_by_id[item_id]
+        quantity = line["quantity"]
 
-        quantity = requested_quantities[
-            item_id
-        ]
-
-        price_paise = document.get(
-            "price_paise"
-        )
+        base_price_paise = document.get("price_paise")
 
         # Defensive database validation.
         if (
-            not isinstance(price_paise, int)
-            or price_paise < 0
+            not isinstance(base_price_paise, int)
+            or base_price_paise < 0
         ):
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -224,18 +226,25 @@ def create_order(
                 ),
             )
 
-        line_total_paise = (
-            price_paise * quantity
+        customization_delta_paise, customization_snapshot = (
+            price_delta_for_customizations(
+                document,
+                [c.model_dump() for c in line["customizations"]],
+            )
         )
+
+        unit_price_paise = base_price_paise + customization_delta_paise
+        line_total_paise = unit_price_paise * quantity
 
         order_items.append(
             {
                 "menu_item_id": item_id,
                 "name": document["name"],
                 "category": document["category"],
-                "unit_price_paise": price_paise,
+                "unit_price_paise": unit_price_paise,
                 "quantity": quantity,
                 "line_total_paise": line_total_paise,
+                "customizations": customization_snapshot,
             }
         )
 

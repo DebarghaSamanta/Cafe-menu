@@ -18,10 +18,16 @@ REQUIRED_TEST_TABLES = [
         "is_active": True,
     },
     {
-        "_id": "table-008",
-        "table_number": 8,
-        "is_active": True,
+            "_id": "table-008",
+            "table_number": 8,
+            "is_active": True,
     },
+    {
+            "_id": "table-010",
+            "table_number": 10,
+            "is_active": True,
+    },
+
 ]
 
 

@@ -148,6 +148,7 @@ def get_menu(
         "category": 1,
         "price_paise": 1,
         "is_available": 1,
+        "customization_groups": 1,
     }
 
     try:
@@ -175,6 +176,9 @@ def get_menu(
                     category=document["category"],
                     price=price_paise / 100,
                     is_available=document["is_available"],
+                    customization_groups=document.get(
+                        "customization_groups", []
+                    ),
                 )
             )
 

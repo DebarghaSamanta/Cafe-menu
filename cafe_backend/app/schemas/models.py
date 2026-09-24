@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-
+from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -30,6 +30,18 @@ class TableContextResponse(BaseModel):
 # =========================================================
 # MENU
 # =========================================================
+class CustomizationChoice(BaseModel):
+    id: str = Field(min_length=1, max_length=50)
+    label: str = Field(min_length=1, max_length=100)
+    price_delta_paise: int = Field(default=0, ge=0)
+
+
+class CustomizationGroup(BaseModel):
+    id: str = Field(min_length=1, max_length=50)
+    label: str = Field(min_length=1, max_length=100)
+    type: Literal["single", "multi"]
+    required: bool = False
+    choices: list[CustomizationChoice] = Field(min_length=1)
 
 class MenuItemResponse(BaseModel):
     id: str
@@ -49,11 +61,13 @@ class MenuItemResponse(BaseModel):
         max_length=50,
     )
 
-    # Public API value is in rupees.
-    # Database value remains price_paise.
     price: float = Field(ge=0)
 
     is_available: bool
+
+    customization_groups: list[CustomizationGroup] = Field(
+        default_factory=list
+    )
 
 
 class MenuResponse(BaseModel):
@@ -65,6 +79,11 @@ class MenuResponse(BaseModel):
 # =========================================================
 # ORDERS
 # =========================================================
+class SelectedCustomization(BaseModel):
+    group_id: str = Field(min_length=1, max_length=50)
+    choice_ids: list[str] = Field(min_length=1, max_length=20)
+
+    model_config = ConfigDict(extra="forbid")
 
 class OrderStatus(str, Enum):
     PENDING = "pending"
@@ -87,7 +106,9 @@ class CreateOrderItemRequest(BaseModel):
         ge=1,
         le=MAX_ORDER_ITEM_QUANTITY,
     )
-
+    customizations: list[SelectedCustomization] = Field(
+        default_factory=list
+    )
     model_config = ConfigDict(
         extra="forbid"
     )
@@ -101,6 +122,17 @@ class CreateOrderRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid"
     )
+
+class SelectedCustomizationChoiceResponse(BaseModel):
+    id: str
+    label: str
+    price_delta_paise: int = 0
+
+
+class SelectedCustomizationGroupResponse(BaseModel):
+    group_id: str
+    group_label: str
+    choices: list[SelectedCustomizationChoiceResponse]
 
 class OrderItemResponse(BaseModel):
     menu_item_id: str
@@ -120,7 +152,9 @@ class OrderItemResponse(BaseModel):
     )
 
     line_total_paise: int = Field(ge=0)
-
+    customizations: list[SelectedCustomizationGroupResponse] = Field(
+        default_factory=list
+    )
 
 class OrderResponse(BaseModel):
     id: str
