@@ -14,6 +14,10 @@ from app.routers.orders import (
 )
 from app.routers.menu import router as menu_router
 from app.routers.tables import router as tables_router
+from app.routers.auth import router as auth_router
+from app.routers.admin import router as admin_router
+from app.routers.admin_menu import router as admin_menu_router
+
 from app.schemas.models import HealthResponse
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -60,6 +64,9 @@ app.add_middleware(
 app.include_router(tables_router)
 app.include_router(menu_router)
 app.include_router(orders_router)
+app.include_router(auth_router)
+app.include_router(admin_router)
+app.include_router(admin_menu_router)
 
 # =========================================================
 # HEALTH
