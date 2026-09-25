@@ -178,6 +178,33 @@ class OrderResponse(BaseModel):
     )
 
 
+
+class ChatRequest(BaseModel):
+    session_id: str = Field(min_length=1, max_length=100)
+    message: str = Field(min_length=1, max_length=500)
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class RecommendedItemResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+    category: str
+    price: float
+    is_available: bool = True
+    tags: list[str] = Field(default_factory=list)
+    customization_groups: list[CustomizationGroup] = Field(
+        default_factory=list
+    )
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    recommended_items: list[RecommendedItemResponse] = Field(
+        default_factory=list
+    )
+
 # =========================================================
 # HEALTH
 # =========================================================

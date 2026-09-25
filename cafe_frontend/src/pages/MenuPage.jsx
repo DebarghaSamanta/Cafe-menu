@@ -21,6 +21,7 @@ import MenuFilters from "../components/MenuFilters";
 import MenuItemCard from "../components/MenuItemCard";
 import Cart from "../components/Cart";
 import CustomizationModal from "../components/CustomizationModal";
+import ChatWidget from "../components/ChatWidget";
 
 function getTableTokenFromUrl() {
   const hash = window.location.hash;
@@ -640,6 +641,11 @@ async function handleProceed() {
         item={customizingItem}
         onClose={() => setCustomizingItem(null)}
         onConfirm={handleConfirmCustomization}
+      />
+      <ChatWidget
+        tableToken={tableToken}
+        onAddToCart={handleAddToCart}
+        onCustomize={setCustomizingItem}
       />
     </main>
   );

@@ -51,6 +51,18 @@ export async function getMenu(tableToken) {
 
   return parseResponse(response);
 }
+export async function sendChatMessage(tableToken, sessionId, message) {
+  const response = await fetch(`${API_BASE_URL}/api/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Table-Token": String(tableToken),
+    },
+    body: JSON.stringify({ session_id: sessionId, message }),
+  });
+
+  return parseResponse(response);
+}
 
 export async function createOrder(tableToken, items) {
   const response = await fetch(`${API_BASE_URL}/api/orders`, {
