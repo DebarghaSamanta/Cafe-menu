@@ -4,6 +4,7 @@ import { MAX_QUANTITY } from "../cart/cartReducer";
 function MenuItemCard({
   item,
   onAddToCart,
+  onCustomize,
   cartQuantity = 0,
 }) {
   const isAtMaximum =
@@ -14,11 +15,14 @@ function MenuItemCard({
     isAtMaximum;
 
   let buttonText = "Add";
+  const isCustomizable = (item.customization_groups?.length ?? 0) > 0;
 
   if (!item.is_available) {
     buttonText = "Unavailable";
   } else if (isAtMaximum) {
     buttonText = "Limit reached";
+  }else if (isCustomizable) {
+    buttonText = "Customize";
   }
 
   return (
@@ -76,7 +80,9 @@ function MenuItemCard({
             className="add-button"
             disabled={addDisabled}
             onClick={() =>
-              onAddToCart(item)
+              isCustomizable
+                ? onCustomize(item)
+                : onAddToCart(item)
             }
           >
             {buttonText}

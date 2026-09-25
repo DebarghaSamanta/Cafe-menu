@@ -20,7 +20,7 @@ import TableHeader from "../components/TableHeader";
 import MenuFilters from "../components/MenuFilters";
 import MenuItemCard from "../components/MenuItemCard";
 import Cart from "../components/Cart";
-
+import CustomizationModal from "../components/CustomizationModal";
 
 function getTableTokenFromUrl() {
   const hash = window.location.hash;
@@ -77,7 +77,8 @@ function MenuPage() {
 
   const [cartMessage, setCartMessage] = useState("");
   const [orderConfirmation, setOrderConfirmation] = useState(null);
-const [placedOrders, setPlacedOrders] = useState([]);
+  const [placedOrders, setPlacedOrders] = useState([]);
+  const [customizingItem, setCustomizingItem] = useState(null);
   // =====================================================
   // RESOLVE TABLE
   // =====================================================
@@ -359,6 +360,19 @@ const [placedOrders, setPlacedOrders] = useState([]);
 
     setCartMessage("");
   }
+  function handleConfirmCustomization(item, customizations, unitPricePaise) {
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        ...item,
+        unit_price_paise: unitPricePaise,
+        customizations,
+      },
+    });
+
+    setCustomizingItem(null);
+    setCartMessage(`${item.name} added to cart.`);
+  }
  function handleNewOrder() {
     setOrderConfirmation(null);
   }
@@ -372,6 +386,10 @@ async function handleProceed() {
     const items = cart.items.map((item) => ({
         menu_item_id: item.id,
         quantity: item.quantity,
+        customizations: (item.customizations || []).map((c) => ({
+            group_id: c.group_id,
+            choice_ids: c.choices.map((choice) => choice.id),
+        })),
     }));
 
     try {
@@ -480,31 +498,6 @@ async function handleProceed() {
             table.table_number
           }
         />
-
-                {placedOrders.length > 0 && (
-          <div className="placed-orders-box">
-            <h3>Your orders</h3>
-
-            {placedOrders.map((order) => (
-              <div key={order.id} className="placed-order">
-                <div className="placed-order-header">
-                  <span>Order #{order.id.slice(-6)}</span>
-                  <span className="placed-order-status">{order.status}</span>
-                </div>
-
-                <ul>
-                  {order.items.map((item) => (
-                    <li key={item.menu_item_id}>
-                      {item.name} × {item.quantity}
-                    </li>
-                  ))}
-                </ul>
-
-                <strong>₹{(order.total_paise / 100).toFixed(2)}</strong>
-              </div>
-            ))}
-          </div>
-        )}
         <MenuFilters
           categories={categories}
           selectedCategory={
@@ -569,6 +562,9 @@ async function handleProceed() {
                     onAddToCart={
                       handleAddToCart
                     }
+                    onCustomize={
+                      setCustomizingItem
+                    }
                     cartQuantity={
                       cartQuantityById.get(
                         item.id
@@ -586,6 +582,32 @@ async function handleProceed() {
           {/* ================================
               CART
           ================================= */}
+          <div className="cart-column">
+
+            {placedOrders.length > 0 && (
+              <div className="placed-orders-box">
+                <h3>Your orders</h3>
+
+                {placedOrders.map((order) => (
+                  <div key={order.id} className="placed-order">
+                    <div className="placed-order-header">
+                      <span>Order #{order.id.slice(-6)}</span>
+                      <span className="placed-order-status">{order.status}</span>
+                    </div>
+
+                    <ul>
+                      {order.items.map((item) => (
+                        <li key={item.menu_item_id}>
+                          {item.name} × {item.quantity}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <strong>₹{(order.total_paise / 100).toFixed(2)}</strong>
+                  </div>
+                ))}
+              </div>
+            )}
 
           <Cart
             items={cart.items}
@@ -612,9 +634,13 @@ async function handleProceed() {
           />
 
         </div>
-
       </div>
-
+      </div>
+      <CustomizationModal
+        item={customizingItem}
+        onClose={() => setCustomizingItem(null)}
+        onConfirm={handleConfirmCustomization}
+      />
     </main>
   );
 }

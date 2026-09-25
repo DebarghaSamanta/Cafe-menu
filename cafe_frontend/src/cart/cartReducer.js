@@ -5,8 +5,19 @@ export const initialCartState = {
 };
 
 
+function buildCustomizationKey(customizations = []) {
+  return customizations
+    .map((c) => `${c.group_id}:${c.choices.map((ch) => ch.id).sort().join(",")}`)
+    .sort()
+    .join("|");
+}
+
 function normalizeCartItem(item) {
-  const price = Number(item.price);
+  const price = Number(
+    item.unit_price_paise !== undefined
+      ? item.unit_price_paise / 100
+      : item.price
+  );
 
   if (
     !item.id ||
@@ -17,12 +28,16 @@ function normalizeCartItem(item) {
     return null;
   }
 
+  const customizations = item.customizations || [];
+
   return {
     id: item.id,
+    lineId: `${item.id}::${buildCustomizationKey(customizations)}`,
     name: item.name,
     category: item.category,
     price_paise: Math.round(price * 100),
     is_available: Boolean(item.is_available),
+    customizations,
   };
 }
 
@@ -42,7 +57,7 @@ export function cartReducer(state, action) {
       }
 
       const existingItem = state.items.find(
-        (cartItem) => cartItem.id === item.id
+        (cartItem) => cartItem.lineId === item.lineId
       );
 
       // Item does not exist in cart yet.
@@ -70,7 +85,7 @@ export function cartReducer(state, action) {
       return {
         ...state,
         items: state.items.map((cartItem) =>
-          cartItem.id === item.id
+          cartItem.lineId === item.lineId
             ? {
                 ...cartItem,
                 quantity:
@@ -90,7 +105,7 @@ export function cartReducer(state, action) {
       return {
         ...state,
         items: state.items.map((item) => {
-          if (item.id !== action.itemId) {
+          if (item.lineId !== action.itemId) {
             return item;
           }
 
@@ -117,7 +132,7 @@ export function cartReducer(state, action) {
       return {
         ...state,
         items: state.items.map((item) => {
-          if (item.id !== action.itemId) {
+          if (item.lineId !== action.itemId) {
             return item;
           }
 
@@ -143,7 +158,7 @@ export function cartReducer(state, action) {
         ...state,
         items: state.items.filter(
           (item) =>
-            item.id !== action.itemId
+            item.lineId !== action.itemId
         ),
       };
     }
