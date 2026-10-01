@@ -3,10 +3,7 @@ import json
 from groq import Groq
 
 from app.config import settings
-from app.services.menu_tools import (
-    TOOL_DEFINITIONS,
-    TOOL_DISPATCH,
-)
+from app.services.menu_tools import TOOL_DEFINITIONS, TOOL_DISPATCH
 
 MAX_TOOL_CALLS_PER_TURN = 3
 
@@ -18,50 +15,55 @@ Rules:
 - Always use the search_menu tool to look up items before recommending
   anything. Never state a price, name, or availability that did not
   come from a tool result.
-- If the request is vague (e.g. "something light"), ask ONE short
-  clarifying question, or make a reasonable first guess with the tool
-  and mention you can narrow it down further.
+- If the customer wants to SEE/LIST all items in a known category or
+  type (e.g. "what coffee options do you have", "show me your
+  beverages", "list your starters"), call search_menu with category
+  or tags set - NOT search_query. Reason: category/tags are exact
+  filters that return the complete, correct set every time; a
+  search_query is similarity-ranked and can silently drop valid
+  items that score slightly below the top match, which would give
+  the customer an incomplete list when they asked for everything.
+- If the customer describes a TASTE, MOOD, or VAGUE craving (e.g.
+  "something with chicken and bread", "a light breakfast", "creamy
+  pasta"), use search_query instead. Reason: these aren't exact
+  category names, so only semantic matching can connect what they
+  said to the right items - a literal filter would miss them.
+- Subjective words like "light" or "refreshing" describe what the
+  customer is looking for - pass them via search_query rather than
+  treating them as hard filters, and only describe an item using
+  properties its actual name/description/tags support. Do not claim
+  a nutritional or dietary property the menu data doesn't state.
+- If the request is vague, ask ONE short clarifying question, or make
+  a reasonable first guess with the tool and offer to narrow it down.
 - If search_menu returns no results, say so plainly and suggest
   loosening the price range or trying a different dish or taste.
 - Keep replies short and conversational (2-4 sentences). Do not list
-  raw item IDs or JSON in your reply - the app shows item cards
-  separately.
+  raw item IDs or JSON - the app shows item cards separately.
 - Only recommend items that are available.
 """
 
-# Simple in-memory session store: session_id -> list of chat messages.
-# Fine for a single-process dev/demo server; swap for a DB collection
-# if you need it to survive restarts or run across multiple workers.
 _sessions: dict[str, list[dict]] = {}
-
 _client: Groq | None = None
 
 
 def _get_client() -> Groq:
     global _client
-
     if _client is None:
         if not settings.groq_api_key:
             raise RuntimeError("GROQ_API_KEY is not configured")
-
         _client = Groq(api_key=settings.groq_api_key)
-
     return _client
 
 
 def _get_history(session_id: str) -> list[dict]:
     if session_id not in _sessions:
-        _sessions[session_id] = [
-            {"role": "system", "content": SYSTEM_PROMPT}
-        ]
-
+        _sessions[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
     return _sessions[session_id]
 
 
 def run_chat_turn(db, session_id: str, user_message: str) -> dict:
     client = _get_client()
     history = _get_history(session_id)
-
     history.append({"role": "user", "content": user_message})
 
     last_tool_items: list[dict] = []
@@ -78,13 +80,8 @@ def run_chat_turn(db, session_id: str, user_message: str) -> dict:
         choice = response.choices[0].message
 
         if not choice.tool_calls:
-            history.append(
-                {"role": "assistant", "content": choice.content}
-            )
-            return {
-                "reply": choice.content,
-                "recommended_items": last_tool_items,
-            }
+            history.append({"role": "assistant", "content": choice.content})
+            return {"reply": choice.content, "recommended_items": last_tool_items}
 
         history.append(
             {
@@ -106,20 +103,17 @@ def run_chat_turn(db, session_id: str, user_message: str) -> dict:
 
         for tool_call in choice.tool_calls:
             tool_name = tool_call.function.name
-
             try:
-                arguments = json.loads(
-                    tool_call.function.arguments or "{}"
-                )
+                arguments = json.loads(tool_call.function.arguments or "{}")
             except json.JSONDecodeError:
                 arguments = {}
 
             tool_fn = TOOL_DISPATCH.get(tool_name)
-
-            if tool_fn is None:
-                result = {"error": f"Unknown tool: {tool_name}"}
-            else:
-                result = tool_fn(db, **arguments)
+            result = (
+                {"error": f"Unknown tool: {tool_name}"}
+                if tool_fn is None
+                else tool_fn(db, **arguments)
+            )
 
             if tool_name == "search_menu":
                 last_tool_items = result.get("items", [])
@@ -137,5 +131,4 @@ def run_chat_turn(db, session_id: str, user_message: str) -> dict:
         "more about what you're craving."
     )
     history.append({"role": "assistant", "content": fallback})
-
     return {"reply": fallback, "recommended_items": last_tool_items}

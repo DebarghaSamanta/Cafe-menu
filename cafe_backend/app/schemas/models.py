@@ -194,17 +194,16 @@ class RecommendedItemResponse(BaseModel):
     price: float
     is_available: bool = True
     tags: list[str] = Field(default_factory=list)
-    customization_groups: list[CustomizationGroup] = Field(
-        default_factory=list
-    )
+    customization_groups: list[dict] = Field(default_factory=list)
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class ChatResponse(BaseModel):
     reply: str
-    recommended_items: list[RecommendedItemResponse] = Field(
-        default_factory=list
-    )
+    recommended_items: list[RecommendedItemResponse] = Field(default_factory=list)
 
+    model_config = ConfigDict(extra="forbid")
 # =========================================================
 # HEALTH
 # =========================================================

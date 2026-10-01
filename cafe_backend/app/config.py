@@ -17,6 +17,9 @@ class Settings(BaseSettings):
 
     groq_api_key: str | None = None
     groq_model: str = "openai/gpt-oss-120b"
+
+    embedding_provider: str = "local"
+    embedding_model: str = "all-MiniLM-L6-v2"
 settings = Settings()
 print("Groq key loaded:", bool(settings.groq_api_key))
 print("Groq model:", settings.groq_model)
