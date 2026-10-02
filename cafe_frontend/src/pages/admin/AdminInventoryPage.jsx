@@ -31,6 +31,10 @@ export default function AdminInventoryPage() {
   const { token } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshIntervalSec, setRefreshIntervalSec] = useState(4);
+  const [lastSyncTime, setLastSyncTime] = useState(new Date());
   const [msg, setMsg] = useState({ type: "", text: "" });
   const [searchQuery, setSearchQuery] = useState("");
   const [stockFilter, setStockFilter] = useState("all"); // "all" | "out" | "low" | "healthy"
@@ -41,21 +45,41 @@ export default function AdminInventoryPage() {
   const [refillAmount, setRefillAmount] = useState(25);
   const [isSavingRefill, setIsSavingRefill] = useState(false);
 
-  const loadMenuData = useCallback(async () => {
-    setLoading(true);
+  const loadMenuData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
+    setIsRefreshing(true);
     try {
       const data = await adminListMenu(token);
       setItems(Array.isArray(data) ? data : []);
+      setLastSyncTime(new Date());
     } catch {
-      setMsg({ type: "error", text: "Failed to load live inventory." });
+      if (!isSilent) {
+        setMsg({ type: "error", text: "Failed to load live inventory." });
+      }
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
+      setIsRefreshing(false);
     }
   }, [token]);
 
+  // Initial load
   useEffect(() => {
-    loadMenuData();
+    loadMenuData(false);
   }, [loadMenuData]);
+
+  // Live Auto-Refresh Polling
+  useEffect(() => {
+    if (!autoRefresh || !token) return;
+
+    const timer = setInterval(() => {
+      // Don't disturb user if they are currently typing in the refill modal
+      if (!refillModalItem) {
+        loadMenuData(true);
+      }
+    }, refreshIntervalSec * 1000);
+
+    return () => clearInterval(timer);
+  }, [autoRefresh, refreshIntervalSec, token, refillModalItem, loadMenuData]);
 
   // Inventory Metrics
   const metrics = useMemo(() => {
@@ -207,20 +231,114 @@ export default function AdminInventoryPage() {
         }}
       >
         <div>
-          <h1 className="ap-title">Live Stock &amp; Inventory Refill</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <h1 className="ap-title">Live Stock &amp; Inventory Refill</h1>
+            {autoRefresh ? (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  backgroundColor: "rgba(63, 112, 77, 0.12)",
+                  color: "var(--cafe-status-ready)",
+                  border: "1px solid rgba(63, 112, 77, 0.3)",
+                  borderRadius: "var(--radius-full)",
+                  padding: "3px 10px",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.02em",
+                }}
+              >
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    backgroundColor: "var(--cafe-status-ready)",
+                    boxShadow: "0 0 6px var(--cafe-status-ready)",
+                    animation: "pulse 1.8s infinite",
+                  }}
+                />
+                <span>LIVE AUTO-SYNC ({refreshIntervalSec}s)</span>
+              </span>
+            ) : (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  backgroundColor: "rgba(160, 61, 61, 0.08)",
+                  color: "var(--cafe-text-muted)",
+                  border: "1px solid var(--cafe-border)",
+                  borderRadius: "var(--radius-full)",
+                  padding: "3px 10px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                }}
+              >
+                <span>SYNC PAUSED</span>
+              </span>
+            )}
+          </div>
           <p className="ap-sub">
-            Real-time tracking of barista ingredients, kitchen stock, and 1-click batch restocks.
+            Real-time stock numbers update live as orders are placed. Last synced:{" "}
+            <strong>{lastSyncTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</strong>
           </p>
         </div>
-        <button
-          className="ap-btn ap-btn-ghost"
-          style={{ border: "1px solid var(--cafe-border)", backgroundColor: "#FFFFFF" }}
-          onClick={loadMenuData}
-          disabled={loading}
-        >
-          <RefreshCw size={15} className={loading ? "ap-spin" : ""} />
-          <span>Refresh Live Stock</span>
-        </button>
+
+        {/* ── Auto-Refresh Controls ── */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          {/* Toggle Button */}
+          <button
+            type="button"
+            className={`ap-btn ${autoRefresh ? "ap-btn-ghost" : "ap-btn-primary"}`}
+            style={{
+              fontSize: "12px",
+              padding: "6px 12px",
+              border: "1px solid var(--cafe-border)",
+              backgroundColor: autoRefresh ? "#FFFFFF" : "var(--cafe-roast-primary)",
+            }}
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            title={autoRefresh ? "Click to Pause Auto-Sync" : "Click to Enable Auto-Sync"}
+          >
+            <Sparkles size={13} color={autoRefresh ? "var(--cafe-terracotta)" : "#FFFFFF"} />
+            <span>{autoRefresh ? "Pause Auto-Sync" : "Enable Auto-Sync"}</span>
+          </button>
+
+          {/* Interval Selector */}
+          {autoRefresh && (
+            <select
+              className="ap-input"
+              style={{ padding: "6px 8px", fontSize: "12px", width: "100px", height: "34px" }}
+              value={refreshIntervalSec}
+              onChange={(e) => setRefreshIntervalSec(Number(e.target.value))}
+              title="Auto-refresh polling frequency"
+            >
+              <option value={3}>Every 3s</option>
+              <option value={4}>Every 4s</option>
+              <option value={8}>Every 8s</option>
+              <option value={15}>Every 15s</option>
+            </select>
+          )}
+
+          {/* Manual Refresh Button */}
+          <button
+            type="button"
+            className="ap-btn ap-btn-ghost"
+            style={{
+              border: "1px solid var(--cafe-border)",
+              backgroundColor: "#FFFFFF",
+              fontSize: "12px",
+              padding: "6px 12px",
+            }}
+            onClick={() => loadMenuData(false)}
+            disabled={loading || isRefreshing}
+            title="Force immediate refresh"
+          >
+            <RefreshCw size={13} className={isRefreshing || loading ? "ap-spin" : ""} />
+            <span>Sync Now</span>
+          </button>
+        </div>
       </div>
 
       {/* ── KPI Metric Cards ── */}

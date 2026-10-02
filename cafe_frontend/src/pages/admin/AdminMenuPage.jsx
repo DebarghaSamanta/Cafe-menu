@@ -47,19 +47,37 @@ export default function AdminMenuPage() {
   const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const load = useCallback(() => {
-    setLoading(true);
+  const load = useCallback((isSilent = false) => {
+    if (!isSilent) setLoading(true);
     adminListMenu(token)
       .then((data) => setItems(Array.isArray(data) ? data : []))
-      .catch(() =>
-        setMsg({ type: "error", text: "Failed to load menu items." })
-      )
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!isSilent) {
+          setMsg({ type: "error", text: "Failed to load menu items." });
+        }
+      })
+      .finally(() => {
+        if (!isSilent) setLoading(false);
+      });
   }, [token]);
 
   useEffect(() => {
-    load();
+    load(false);
   }, [load]);
+
+  // Live Auto-Refresh Polling in background every 5 seconds
+  useEffect(() => {
+    if (!token) return;
+
+    const interval = setInterval(() => {
+      // Don't auto-refresh while editing in modal to avoid overwriting form
+      if (!modal) {
+        load(true);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [token, modal, load]);
 
   function openCreate() {
     setForm(EMPTY_FORM);

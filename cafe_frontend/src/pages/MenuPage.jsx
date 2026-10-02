@@ -147,26 +147,43 @@ function MenuPage() {
   }, []);
 
   // =====================================================
-  // 2. FETCH MENU ITEMS
+  // 2. FETCH MENU ITEMS (WITH LIVE BACKGROUND AUTO-REFRESH)
   // =====================================================
-  const loadMenu = useCallback(async () => {
+  const loadMenu = useCallback(async (isSilent = false) => {
     if (!table) return;
-    setIsLoadingMenu(true);
-    setMenuError("");
+    if (!isSilent) {
+      setIsLoadingMenu(true);
+      setMenuError("");
+    }
 
     try {
       const data = await getMenu(tableToken);
       setMenu(data.items || []);
     } catch (err) {
-      setMenuError(err.message || "Unable to load menu. Please refresh.");
+      if (!isSilent) {
+        setMenuError(err.message || "Unable to load menu. Please refresh.");
+      }
     } finally {
-      setIsLoadingMenu(false);
+      if (!isSilent) {
+        setIsLoadingMenu(false);
+      }
     }
   }, [table, tableToken]);
 
   useEffect(() => {
-    loadMenu();
+    loadMenu(false);
   }, [loadMenu]);
+
+  // Polling every 5s for live stock updates & out-of-stock changes
+  useEffect(() => {
+    if (!table || !tableToken) return;
+
+    const interval = setInterval(() => {
+      loadMenu(true);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [table, tableToken, loadMenu]);
 
   // =====================================================
   // 3. FETCH & POLL ACTIVE TABLE ORDERS (PERSISTENT TRACKING)
