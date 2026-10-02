@@ -1,0 +1,558 @@
+/* ── European Artisan Café Admin Layout & Design System ── */
+
+.al-root {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--cafe-bg);
+  color: var(--cafe-text-body);
+  font-family: var(--font-sans);
+}
+
+/* ── Left Sidebar (European Bistro Style) ── */
+.al-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background-color: var(--cafe-sidebar-bg);
+  border-right: 1px solid var(--cafe-border);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 16px 20px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.al-brand {
+  padding: 0 10px 24px;
+  border-bottom: 1px solid var(--cafe-border);
+  margin-bottom: 20px;
+}
+
+.al-brand-name {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--cafe-text-main);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.al-brand-role {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--cafe-text-muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.al-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.al-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  color: var(--cafe-text-body);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.al-nav-item:hover {
+  background-color: rgba(78, 42, 31, 0.06);
+  color: var(--cafe-roast-dark);
+}
+
+.al-nav-item.active {
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.al-nav-item.active .al-nav-icon {
+  color: #FFFFFF;
+}
+
+.al-nav-icon {
+  color: var(--cafe-text-muted);
+  transition: color 0.15s ease;
+}
+
+.al-nav-divider {
+  height: 1px;
+  background-color: var(--cafe-border);
+  margin: 14px 8px;
+}
+
+.al-nav-sub {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.al-sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.al-quote {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--cafe-text-muted);
+  text-align: center;
+  padding: 0 10px;
+  line-height: 1.4;
+}
+
+.al-quote-dash {
+  width: 24px;
+  height: 1px;
+  background-color: var(--cafe-border-dark);
+  margin: 8px auto 0;
+}
+
+.al-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--cafe-border);
+}
+
+.al-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.al-user-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.al-user-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cafe-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.al-user-role {
+  display: block;
+  font-size: 11px;
+  color: var(--cafe-text-muted);
+}
+
+.al-logout {
+  background: none;
+  border: none;
+  color: var(--cafe-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.al-logout:hover {
+  background-color: rgba(160, 61, 61, 0.1);
+  color: var(--cafe-status-cancelled);
+}
+
+/* ── Main Canvas ── */
+.al-main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.al-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 36px;
+  border-bottom: 1px solid var(--cafe-border);
+  background-color: var(--cafe-bg);
+}
+
+.al-tagline {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--cafe-text-muted);
+}
+
+.al-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.al-clock {
+  font-size: 13px;
+  color: var(--cafe-text-muted);
+  font-weight: 500;
+}
+
+.al-admin-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border-radius: var(--radius-full);
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.al-admin-pill:hover {
+  border-color: var(--cafe-roast-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.al-pill-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.al-pill-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cafe-text-main);
+}
+
+.al-content {
+  flex: 1;
+  padding: 32px 36px;
+}
+
+.al-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 36px;
+  border-top: 1px solid var(--cafe-border);
+  font-size: 12px;
+  color: var(--cafe-text-muted);
+}
+
+/* ── Global Shared UI Component Tokens ── */
+
+.ap-header {
+  margin-bottom: 24px;
+}
+
+.ap-title {
+  font-family: var(--font-serif);
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--cafe-text-main);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.ap-sub {
+  font-size: 14px;
+  color: var(--cafe-text-muted);
+  margin-top: 6px;
+  font-style: italic;
+  font-family: var(--font-serif);
+}
+
+/* ── Cards & Containers (Mac Glassmorphic & Clean Borders) ── */
+.ap-card {
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.ap-card-glass {
+  background-color: var(--cafe-card-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--cafe-border);
+  box-shadow: var(--shadow-glass);
+}
+
+/* ── Tables ── */
+.ap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: left;
+}
+
+.ap-table th {
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cafe-text-muted);
+  border-bottom: 1px solid var(--cafe-border);
+  background-color: rgba(239, 232, 221, 0.4);
+}
+
+.ap-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cafe-border);
+  color: var(--cafe-text-body);
+  vertical-align: middle;
+}
+
+.ap-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.ap-table tbody tr:hover {
+  background-color: rgba(239, 232, 221, 0.25);
+}
+
+.ap-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Buttons ── */
+.ap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.ap-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ap-btn-primary {
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  border-color: var(--cafe-roast-primary);
+}
+
+.ap-btn-primary:hover:not(:disabled) {
+  background-color: var(--cafe-roast-hover);
+  border-color: var(--cafe-roast-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.ap-btn-ghost {
+  background-color: var(--cafe-card-bg);
+  border-color: var(--cafe-border);
+  color: var(--cafe-text-body);
+}
+
+.ap-btn-ghost:hover:not(:disabled) {
+  background-color: var(--cafe-bg-alt);
+  border-color: var(--cafe-border-dark);
+  color: var(--cafe-text-main);
+}
+
+.ap-btn-danger {
+  background-color: rgba(160, 61, 61, 0.08);
+  border-color: rgba(160, 61, 61, 0.3);
+  color: var(--cafe-status-cancelled);
+}
+
+.ap-btn-danger:hover:not(:disabled) {
+  background-color: var(--cafe-status-cancelled);
+  color: #FFFFFF;
+  border-color: var(--cafe-status-cancelled);
+}
+
+.ap-btn-success {
+  background-color: var(--cafe-status-ready);
+  color: #FFFFFF;
+  border-color: var(--cafe-status-ready);
+}
+
+.ap-btn-success:hover:not(:disabled) {
+  background-color: var(--cafe-status-completed);
+}
+
+/* ── Inputs & Selects ── */
+.ap-input, .ap-select, .ap-textarea {
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border-dark);
+  border-radius: var(--radius-md);
+  color: var(--cafe-text-main);
+  padding: 9px 13px;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: var(--font-sans);
+}
+
+.ap-input:focus, .ap-select:focus, .ap-textarea:focus {
+  border-color: var(--cafe-roast-primary);
+  box-shadow: 0 0 0 3px rgba(78, 42, 31, 0.1);
+}
+
+/* ── Badges ── */
+.ap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.ap-badge-pending   { background-color: rgba(194, 120, 42, 0.12); color: #9A5A1A; border: 1px solid rgba(194, 120, 42, 0.25); }
+.ap-badge-confirmed { background-color: rgba(74, 110, 130, 0.12); color: #375363; border: 1px solid rgba(74, 110, 130, 0.25); }
+.ap-badge-preparing { background-color: rgba(140, 72, 53, 0.12); color: var(--cafe-terracotta); border: 1px solid rgba(140, 72, 53, 0.25); }
+.ap-badge-ready     { background-color: rgba(63, 112, 77, 0.12); color: var(--cafe-status-ready); border: 1px solid rgba(63, 112, 77, 0.25); }
+.ap-badge-completed { background-color: rgba(46, 90, 54, 0.12); color: var(--cafe-status-completed); border: 1px solid rgba(46, 90, 54, 0.25); }
+.ap-badge-cancelled { background-color: rgba(160, 61, 61, 0.12); color: var(--cafe-status-cancelled); border: 1px solid rgba(160, 61, 61, 0.25); }
+
+/* ── Toast / Alerts ── */
+.ap-success {
+  background-color: rgba(63, 112, 77, 0.1);
+  border: 1px solid rgba(63, 112, 77, 0.3);
+  color: var(--cafe-status-completed);
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ap-error {
+  background-color: rgba(160, 61, 61, 0.1);
+  border: 1px solid rgba(160, 61, 61, 0.3);
+  color: var(--cafe-status-cancelled);
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ── Modal (Mac style glass overlay) ── */
+.ap-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(42, 23, 16, 0.35);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+.ap-modal {
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border-dark);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  animation: apModalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes apModalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.ap-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--cafe-border);
+  padding-bottom: 12px;
+}
+
+.ap-modal-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--cafe-text-main);
+  font-weight: 700;
+}
+
+.ap-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+/* ── Spinner & Empty State ── */
+.ap-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--cafe-text-muted);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 16px;
+}
+
+.ap-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(78, 42, 31, 0.15);
+  border-top-color: var(--cafe-roast-primary);
+  border-radius: 50%;
+  animation: apSpin 0.7s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes apSpin {
+  to { transform: rotate(360deg); }
+}

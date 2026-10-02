@@ -49,8 +49,12 @@ def create_menu_item(
     menu_id = f"menu-{next_number:03d}"
 
     menu_item = menu_data.model_dump()
-
     menu_item["_id"] = menu_id
+    if "stock_quantity" not in menu_item or menu_item["stock_quantity"] is None:
+        menu_item["stock_quantity"] = 50
+
+    if menu_item["stock_quantity"] <= 0:
+        menu_item["is_available"] = False
 
     db.menu_items.insert_one(
         menu_item
@@ -72,6 +76,8 @@ def get_all_menu_items(db):
         menu_item["_id"] = str(
             menu_item["_id"]
         )
+        if "stock_quantity" not in menu_item:
+            menu_item["stock_quantity"] = 50
 
     return menu_items
 
@@ -96,6 +102,9 @@ def get_menu_item(
             detail="Menu item not found",
         )
 
+    if "stock_quantity" not in menu_item:
+        menu_item["stock_quantity"] = 50
+
     return menu_item
 
 
@@ -117,6 +126,13 @@ def update_menu_item(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No fields provided for update",
         )
+
+    # Automatic stock availability logic
+    if "stock_quantity" in update_data and update_data["stock_quantity"] is not None:
+        if update_data["stock_quantity"] <= 0:
+            update_data["is_available"] = False
+        elif "is_available" not in update_data:
+            update_data["is_available"] = True
 
     result = db.menu_items.update_one(
         {

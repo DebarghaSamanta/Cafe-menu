@@ -15,7 +15,7 @@ from app.services.menu_admin_service import (
 
 
 router = APIRouter(
-    prefix="/api/admin/menu",
+    prefix="/menu",
     tags=["Admin Menu"],
 )
 

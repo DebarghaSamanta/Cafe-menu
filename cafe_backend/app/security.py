@@ -175,3 +175,23 @@ def require_staff(
         )
 
     return current_user
+
+
+def require_staff_or_admin(
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Allow STAFF or ADMIN users.
+
+    Used for staff-panel routes that the admin (cafe owner)
+    should also be able to view — e.g. the kitchen order queue,
+    menu availability, table list.
+    """
+
+    if current_user["role"] not in ("STAFF", "ADMIN"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Staff or Admin access required",
+        )
+
+    return current_user

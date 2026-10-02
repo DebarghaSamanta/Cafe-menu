@@ -23,8 +23,6 @@ async function parseResponse(response) {
 }
 
 export async function getTableContext(tableToken) {
-  console.log("getTableContext received:", tableToken);
-
   const response = await fetch(
     `${API_BASE_URL}/api/table/context`,
     {
@@ -39,13 +37,13 @@ export async function getTableContext(tableToken) {
 }
 
 export async function getMenu(tableToken) {
+  const headers = {};
+  if (tableToken) headers["X-Table-Token"] = String(tableToken);
   const response = await fetch(
     `${API_BASE_URL}/api/menu`,
     {
       method: "GET",
-      headers: {
-        "X-Table-Token": tableToken,
-      },
+      headers,
     }
   );
 
@@ -64,3 +62,49 @@ export async function createOrder(tableToken, items) {
 
   return parseResponse(response);
 }
+
+export async function payCustomerOrder(tableToken, orderId, paymentMethod = "upi") {
+  const headers = { "Content-Type": "application/json" };
+  if (tableToken) headers["X-Table-Token"] = String(tableToken);
+
+  const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/pay`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ payment_method: paymentMethod }),
+  });
+
+  return parseResponse(response);
+}
+
+export async function getOrder(tableToken, orderId) {
+  const headers = {};
+  if (tableToken) headers["X-Table-Token"] = String(tableToken);
+
+  const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+    method: "GET",
+    headers,
+  });
+
+  return parseResponse(response);
+}
+
+export async function getCustomerInvoice(orderId) {
+  const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/invoice`, {
+    method: "GET",
+  });
+
+  return parseResponse(response);
+}
+
+export async function getTableOrders(tableToken) {
+  const headers = {};
+  if (tableToken) headers["X-Table-Token"] = String(tableToken);
+
+  const response = await fetch(`${API_BASE_URL}/api/orders/table/active`, {
+    method: "GET",
+    headers,
+  });
+
+  return parseResponse(response);
+}
+

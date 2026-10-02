@@ -58,6 +58,11 @@ class AdminMenuItemCreate(BaseModel):
         ge=0,
     )
 
+    stock_quantity: int = Field(
+        default=50,
+        ge=0,
+    )
+
     is_available: bool = True
 
     customization: MenuCustomization = Field(
@@ -81,6 +86,11 @@ class AdminMenuItemUpdate(BaseModel):
     )
 
     price_paise: Optional[int] = Field(
+        default=None,
+        ge=0,
+    )
+
+    stock_quantity: Optional[int] = Field(
         default=None,
         ge=0,
     )

@@ -147,6 +147,7 @@ def get_menu(
         "description": 1,
         "category": 1,
         "price_paise": 1,
+        "stock_quantity": 1,
         "is_available": 1,
         "customization_groups": 1,
     }
@@ -167,6 +168,8 @@ def get_menu(
 
         for document in cursor:
             price_paise = document["price_paise"]
+            stock_qty = document.get("stock_quantity", 50)
+            is_avail = document.get("is_available", True) and (stock_qty > 0)
 
             items.append(
                 MenuItemResponse(
@@ -175,7 +178,8 @@ def get_menu(
                     description=document["description"],
                     category=document["category"],
                     price=price_paise / 100,
-                    is_available=document["is_available"],
+                    stock_quantity=stock_qty,
+                    is_available=is_avail,
                     customization_groups=document.get(
                         "customization_groups", []
                     ),

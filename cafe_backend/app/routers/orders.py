@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from uuid import uuid4
+from pydantic import BaseModel
 
 from fastapi import (
     APIRouter,
@@ -13,6 +14,8 @@ from app.schemas.models import (
     CreateOrderRequest,
     OrderResponse,
 )
+from app.schemas.invoice import InvoiceResponse
+from app.services.invoice_service import get_invoice
 from app.services.table_resolution import (
     resolve_table_from_token,
 )
@@ -136,6 +139,7 @@ def create_order(
                 "name": 1,
                 "category": 1,
                 "price_paise": 1,
+                "stock_quantity": 1,
                 "is_available": 1,
                 "customization_groups": 1,
             },
@@ -165,25 +169,31 @@ def create_order(
         )
 
     # =====================================================
-    # 5. Re-check availability
+    # 5. Re-check availability & Stock Quantities
     # =====================================================
 
     unavailable_items = []
 
     for item_id in menu_item_ids:
         document = menu_by_id[item_id]
+        req_qty = requested_quantities[item_id]
+        stock_qty = document.get("stock_quantity", 50)
+        is_avail = document.get("is_available", True) and (stock_qty > 0)
 
-        if not document.get(
-            "is_available",
-            False,
-        ):
+        if not is_avail:
             unavailable_items.append(
                 {
                     "menu_item_id": item_id,
-                    "name": document.get(
-                        "name",
-                        "Unknown item",
-                    ),
+                    "name": document.get("name", "Unknown item"),
+                    "reason": "Item is out of stock",
+                }
+            )
+        elif req_qty > stock_qty:
+            unavailable_items.append(
+                {
+                    "menu_item_id": item_id,
+                    "name": document.get("name", "Unknown item"),
+                    "reason": f"Only {stock_qty} remaining in stock (requested: {req_qty})",
                 }
             )
 
@@ -191,10 +201,7 @@ def create_order(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={
-                "message": (
-                    "One or more selected items "
-                    "are currently unavailable"
-                ),
+                "message": "One or more selected items cannot be fulfilled due to stock limits",
                 "items": unavailable_items,
             },
         )
@@ -255,54 +262,204 @@ def create_order(
     # =====================================================
 
     order_id = generate_order_id()
-
+    now = datetime.now(timezone.utc)
     order_document = {
         "_id": order_id,
-
         "table_id": table_id,
         "table_number": table_number,
-
         "items": order_items,
-
         "total_paise": total_paise,
-
         "status": "pending",
-
-        "created_at": datetime.now(
-            timezone.utc
-        ),
+        "payment_status": "unpaid",
+        "payment_method": None,
+        "created_at": now,
+        "paid_at": None,
+        "confirmed_at": None,
+        "preparing_at": None,
+        "ready_at": None,
+        "completed_at": None,
+        "cancelled_at": None,
     }
 
     # =====================================================
-    # 8. Save order
+    # 8. Save order & Atomically Decrement Stock
     # =====================================================
 
     try:
-        db.orders.insert_one(
-            order_document
-        )
-
+        db.orders.insert_one(order_document)
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Unable to save the order",
         )
 
+    # Decrement stock count and auto-disable if 0
+    for item_id, req_qty in requested_quantities.items():
+        doc = menu_by_id[item_id]
+        curr_stock = doc.get("stock_quantity", 50)
+        new_stock = max(0, curr_stock - req_qty)
+        db.menu_items.update_one(
+            {"_id": item_id},
+            {
+                "$set": {
+                    "stock_quantity": new_stock,
+                    "is_available": new_stock > 0,
+                }
+            },
+        )
+
     # =====================================================
     # 9. Return server-created order
     # =====================================================
 
+    return _serialize_customer_order(order_document)
+
+
+def _serialize_customer_order(order: dict) -> OrderResponse:
     return OrderResponse(
-        id=order_id,
-        table_id=table_id,
-        table_number=table_number,
-        items=order_items,
-        total_paise=total_paise,
-        status="pending",
-        created_at=order_document[
-            "created_at"
-        ],
+        id=str(order["_id"]),
+        table_id=str(order["table_id"]),
+        table_number=order["table_number"],
+        items=order["items"],
+        total_paise=order["total_paise"],
+        status=order["status"],
+        payment_status=order.get("payment_status", "paid" if order.get("status") == "completed" else "unpaid"),
+        payment_method=order.get("payment_method"),
+        created_at=order["created_at"],
+        paid_at=order.get("paid_at"),
+        confirmed_at=order.get("confirmed_at"),
+        preparing_at=order.get("preparing_at"),
+        ready_at=order.get("ready_at"),
+        completed_at=order.get("completed_at"),
+        cancelled_at=order.get("cancelled_at"),
+        invoice_number=order.get("invoice_number"),
     )
+
+
+class CustomerPaymentPayload(BaseModel):
+    payment_method: str = "upi"  # "upi", "card", "cash", "cash_request"
+
+
+@router.post(
+    "/{order_id}/pay",
+    response_model=OrderResponse,
+)
+def pay_customer_order(
+    order_id: str,
+    payload: CustomerPaymentPayload,
+    request: Request,
+    x_table_token: str | None = Header(
+        default=None,
+        alias="X-Table-Token",
+    ),
+):
+    """
+    Customer settles payment (pre-paid workflow).
+    - Digital Payment (UPI / Card): Immediately marks order as PAID, confirms order for kitchen, and generates invoice.
+    - Pay at Counter (Cash Request): Marks order for cash settlement at counter/table.
+    """
+    db = request.app.state.db
+
+    order = db.orders.find_one({"_id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if x_table_token:
+        table = resolve_table_from_token(db, x_table_token)
+        if str(order["table_id"]) != str(table["_id"]):
+            raise HTTPException(status_code=403, detail="Unauthorized table access")
+
+    now = datetime.now(timezone.utc)
+    method = payload.payment_method or "upi"
+
+    if method == "cash_request":
+        db.orders.update_one(
+            {"_id": order_id},
+            {
+                "$set": {
+                    "payment_method": "cash",
+                    "payment_status": "cash_pending",
+                    "updated_at": now,
+                }
+            },
+        )
+    else:
+        db.orders.update_one(
+            {"_id": order_id},
+            {
+                "$set": {
+                    "payment_status": "PAID",
+                    "payment_method": method,
+                    "paid_at": now,
+                    "status": "confirmed",
+                    "confirmed_at": now,
+                    "updated_at": now,
+                }
+            },
+        )
+        from app.services.invoice_service import create_or_update_invoice
+        create_or_update_invoice(db, order_id, payment_method=method)
+
+    updated = db.orders.find_one({"_id": order_id})
+    return _serialize_customer_order(updated)
+
+
+@router.get(
+    "/table/active",
+    response_model=list[OrderResponse],
+)
+def get_table_active_orders(
+    request: Request,
+    x_table_token: str | None = Header(
+        default=None,
+        alias="X-Table-Token",
+    ),
+):
+    """
+    Return only the current active order or the single latest completed order for this table.
+    Old past orders from previous sessions are excluded.
+    """
+    db = request.app.state.db
+
+    table = resolve_table_from_token(
+        db,
+        x_table_token,
+    )
+
+    table_id = str(table["_id"])
+
+    # 1. Look for active in-flight orders for this table (latest 1)
+    active_orders = list(
+        db.orders.find({
+            "table_id": table_id,
+            "status": {"$in": ["pending", "confirmed", "preparing", "ready"]},
+        })
+        .sort("created_at", -1)
+        .limit(1)
+    )
+
+    if active_orders:
+        return [_serialize_customer_order(doc) for doc in active_orders]
+
+    # 2. If no in-flight order, return only the single latest completed order within the last 2 hours
+    latest_order = db.orders.find_one(
+        {
+            "table_id": table_id,
+            "status": "completed",
+        },
+        sort=[("created_at", -1)],
+    )
+
+    if latest_order:
+        now = datetime.now(timezone.utc)
+        order_time = latest_order.get("completed_at") or latest_order.get("created_at")
+        if order_time:
+            if order_time.tzinfo is None:
+                order_time = order_time.replace(tzinfo=timezone.utc)
+            if (now - order_time).total_seconds() < 7200:
+                return [_serialize_customer_order(latest_order)]
+
+    return []
 
 
 @router.get(
@@ -321,31 +478,16 @@ def get_order(
     Return an order only if it belongs to the
     table associated with the supplied QR token.
     """
-
     db = request.app.state.db
-
-    # =====================================================
-    # 1. Resolve current table
-    # =====================================================
 
     table = resolve_table_from_token(
         db,
         x_table_token,
     )
 
-    current_table_id = str(
-        table["_id"]
-    )
+    current_table_id = str(table["_id"])
 
-    # =====================================================
-    # 2. Fetch order
-    # =====================================================
-
-    order = db.orders.find_one(
-        {
-            "_id": order_id
-        }
-    )
+    order = db.orders.find_one({"_id": order_id})
 
     if order is None:
         raise HTTPException(
@@ -353,33 +495,29 @@ def get_order(
             detail="Order not found",
         )
 
-    # =====================================================
-    # 3. Strict table isolation
-    # =====================================================
-
-    order_table_id = str(
-        order["table_id"]
-    )
+    order_table_id = str(order["table_id"])
 
     if order_table_id != current_table_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=(
-                "You are not authorized to access "
-                "this order"
-            ),
+            detail="You are not authorized to access this order",
         )
 
-    # =====================================================
-    # 4. Return order
-    # =====================================================
+    return _serialize_customer_order(order)
 
-    return OrderResponse(
-        id=str(order["_id"]),
-        table_id=order["table_id"],
-        table_number=order["table_number"],
-        items=order["items"],
-        total_paise=order["total_paise"],
-        status=order["status"],
-        created_at=order["created_at"],
+
+@router.get(
+    "/{order_id}/invoice",
+    response_model=InvoiceResponse,
+)
+def get_order_public_invoice(
+    order_id: str,
+    request: Request,
+):
+    """
+    Public / customer endpoint to fetch authoritative invoice data.
+    """
+    return get_invoice(
+        request.app.state.db,
+        order_id,
     )

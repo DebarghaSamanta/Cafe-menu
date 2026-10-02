@@ -1,0 +1,189 @@
+/* ── European Artisan Café Login Page ── */
+
+.lp-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--cafe-bg);
+  padding: 32px 20px;
+  box-sizing: border-box;
+}
+
+.lp-container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ── Crest / Brand ── */
+.lp-crest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.lp-crest-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-md);
+}
+
+.lp-brand-name {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--cafe-text-main);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.lp-brand-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--cafe-text-muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* ── Glassmorphic Card ── */
+.lp-card {
+  width: 100%;
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 30px;
+  box-shadow: var(--shadow-md);
+  box-sizing: border-box;
+}
+
+.lp-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cafe-text-main);
+  margin-bottom: 6px;
+}
+
+.lp-sub {
+  font-size: 13.5px;
+  color: var(--cafe-text-muted);
+  margin-bottom: 24px;
+  font-style: italic;
+  font-family: var(--font-serif);
+}
+
+.lp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lp-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-group label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cafe-text-body);
+}
+
+.lp-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lp-input-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--cafe-text-muted);
+  pointer-events: none;
+}
+
+.lp-input-wrapper input {
+  width: 100%;
+  background-color: var(--cafe-peach-light);
+  border: 1px solid var(--cafe-peach-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px 10px 38px;
+  font-size: 14px;
+  color: var(--cafe-text-main);
+  outline: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.lp-input-wrapper input:focus {
+  background-color: #FFFFFF;
+  border-color: var(--cafe-roast-primary);
+  box-shadow: 0 0 0 3px rgba(78, 42, 31, 0.08);
+}
+
+.lp-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(160, 61, 61, 0.08);
+  border: 1px solid rgba(160, 61, 61, 0.25);
+  color: var(--cafe-status-cancelled);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.lp-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  border: 1px solid var(--cafe-roast-primary);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.lp-submit-btn:hover:not(:disabled) {
+  background-color: var(--cafe-roast-hover);
+  border-color: var(--cafe-roast-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.lp-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lp-footer {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--cafe-text-muted);
+}

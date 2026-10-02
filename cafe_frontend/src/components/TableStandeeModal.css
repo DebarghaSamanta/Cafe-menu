@@ -1,0 +1,329 @@
+/* ── Table Standee & QR Modal Styling ── */
+
+.ts-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(42, 23, 16, 0.45);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ts-modal-box {
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border-dark);
+  border-radius: var(--radius-lg);
+  max-width: 540px;
+  width: 100%;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.ts-modal-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--cafe-border);
+  background-color: var(--cafe-bg);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ts-modal-heading {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--cafe-text-main);
+  font-weight: 700;
+  margin: 0;
+}
+
+.ts-modal-sub {
+  font-size: 12px;
+  color: var(--cafe-text-muted);
+  margin-top: 2px;
+}
+
+.ts-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ts-print-area {
+  padding: 24px 20px 40px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: #ECE5DA;
+  flex: 1;
+}
+
+/* ── Artisan Table Standee Tent Card Preview ── */
+.ts-standee-card {
+  width: 350px;
+  max-width: 100%;
+  height: auto;
+  min-height: min-content;
+  background-color: #FAF6F0;
+  border: 3px solid #4E2A1F;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(42, 23, 16, 0.12);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin: 0 auto;
+}
+
+.ts-inner-border {
+  border: 1px solid #C9BBA7;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: auto;
+}
+
+.ts-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.ts-brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #4E2A1F;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.ts-cafe-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2A1710;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.ts-cafe-sub {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #85746C;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+.ts-table-badge {
+  background-color: #4E2A1F;
+  color: #FFFFFF;
+  padding: 5px 20px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ts-qr-wrapper {
+  background-color: #FFFFFF;
+  border: 1px solid #E2D7C8;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(42, 23, 16, 0.05);
+}
+
+.ts-qr-svg svg {
+  display: block;
+}
+
+.ts-instructions {
+  margin-bottom: 12px;
+}
+
+.ts-scan-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2A1710;
+  margin: 0 0 3px;
+}
+
+.ts-scan-desc {
+  font-size: 10.5px;
+  color: #6B564E;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 240px;
+}
+
+.ts-card-divider {
+  width: 70px;
+  height: 1px;
+  background-color: #E2D7C8;
+  margin-bottom: 10px;
+}
+
+.ts-card-footer {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #85746C;
+  text-transform: uppercase;
+}
+
+/* ── Strict Single-Page Print / PDF Media Query ── */
+@page {
+  size: auto;
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    background: #FAF6F0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide entire page tree */
+  body > * {
+    display: none !important;
+  }
+
+  /* Only show root and the active modal */
+  body > #root {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+
+  #root * {
+    visibility: hidden;
+  }
+
+  .ts-modal-overlay,
+  .ts-modal-overlay * {
+    visibility: visible !important;
+  }
+
+  .al-sidebar,
+  .al-topbar,
+  .al-footer,
+  .al-content,
+  .ts-modal-topbar {
+    display: none !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .ts-modal-overlay {
+    position: static !important;
+    inset: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .ts-modal-box {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .ts-print-area {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .ts-standee-card {
+    width: 96mm !important;
+    max-width: 96mm !important;
+    margin: 0 auto !important;
+    box-shadow: none !important;
+    border: 2.5px solid #4E2A1F !important;
+    background-color: #FAF6F0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .ts-inner-border {
+    padding: 16px 14px !important;
+  }
+
+  .ts-table-badge {
+    margin-bottom: 12px !important;
+    padding: 4px 16px !important;
+    font-size: 15px !important;
+  }
+
+  .ts-qr-wrapper {
+    padding: 8px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .ts-qr-svg svg {
+    width: 145px !important;
+    height: 145px !important;
+  }
+
+  .ts-instructions {
+    margin-bottom: 8px !important;
+  }
+
+  .ts-scan-title {
+    font-size: 13px !important;
+  }
+
+  .ts-scan-desc {
+    font-size: 9.5px !important;
+  }
+
+  .ts-card-footer {
+    font-size: 7.5px !important;
+  }
+}
