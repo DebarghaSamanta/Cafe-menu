@@ -124,7 +124,7 @@ function MenuPage() {
       setTableToken(token);
 
       if (!token) {
-        setTableError("No table token found in the URL. Please scan the official QR code at your table.");
+        // Explore Menu Mode: Public catalogue browsing without ordering
         setIsLoadingTable(false);
         return;
       }
@@ -134,7 +134,7 @@ function MenuPage() {
         setTable(tableData);
       } catch (err) {
         if (err.status === 401) {
-          setTableError("This QR code is invalid or has expired. Please ask our staff or re-scan your table card.");
+          setTableError("This table QR code is invalid or has expired. You can still browse our menu catalogue below.");
         } else {
           setTableError(err.message || "Unable to resolve table details.");
         }
@@ -150,7 +150,6 @@ function MenuPage() {
   // 2. FETCH MENU ITEMS (WITH LIVE BACKGROUND AUTO-REFRESH)
   // =====================================================
   const loadMenu = useCallback(async (isSilent = false) => {
-    if (!table) return;
     if (!isSilent) {
       setIsLoadingMenu(true);
       setMenuError("");
@@ -168,13 +167,13 @@ function MenuPage() {
         setIsLoadingMenu(false);
       }
     }
-  }, [table, tableToken]);
+  }, [tableToken]);
 
   useEffect(() => {
     loadMenu(false);
   }, [loadMenu]);
 
-  // Polling every 5s for live stock updates & out-of-stock changes
+  // Polling every 5s for live stock updates & out-of-stock changes (active dine-in only)
   useEffect(() => {
     if (!table || !tableToken) return;
 
@@ -577,6 +576,8 @@ function MenuPage() {
     );
   }
 
+  const isExploreMode = !table || !tableToken;
+
   // =====================================================
   // MAIN CUSTOMER MENU UI
   // =====================================================
@@ -586,22 +587,41 @@ function MenuPage() {
       <TableHeader tableNumber={table?.table_number} />
 
       <div className="mp-container">
-        {/* ── Hero Banner ── */}
-        <div className="mp-hero">
-          <div className="mp-hero-content">
-            <h2>Artisan Table Service</h2>
-            <p>
-              Freshly roasted single-origin coffees, handcrafted beverages, and European gourmet bakery served directly to your table.
-            </p>
+        {/* ── Hero Banner / Catalogue Header ── */}
+        {isExploreMode ? (
+          <div className="mp-catalogue-banner">
+            <div className="mp-catalogue-banner-body">
+              <div className="mp-catalogue-badge">
+                <Coffee size={13} />
+                <span>ARTISAN MENU CATALOGUE</span>
+              </div>
+              <h2 className="mp-catalogue-title">Curated Brews &amp; Gourmet Bakes</h2>
+              <p className="mp-catalogue-desc">
+                Browse our selection of single-origin roasts, signature cold brews, and house-laminated viennoiserie with live pricing in INR (inclusive of 5% GST).
+              </p>
+              <div className="mp-catalogue-qr-note">
+                <QrCode size={16} />
+                <span><strong>Dine-In Notice:</strong> Scan the wooden QR plaque at your table to customize and place instant orders directly to the barista.</span>
+              </div>
+            </div>
           </div>
+        ) : (
+          <div className="mp-hero">
+            <div className="mp-hero-content">
+              <h2>Artisan Table {table?.table_number} Service</h2>
+              <p>
+                Freshly roasted single-origin coffees, handcrafted beverages, and European gourmet bakery served directly to your table.
+              </p>
+            </div>
 
-          <div style={{ display: "none", mdDisplay: "block" }}>
-            <Coffee size={38} strokeWidth={1.5} style={{ color: "var(--cafe-roast-primary)", opacity: 0.6 }} />
+            <div style={{ display: "none", mdDisplay: "block" }}>
+              <Coffee size={38} strokeWidth={1.5} style={{ color: "var(--cafe-roast-primary)", opacity: 0.6 }} />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* ── Current Order Live Tracker with Multi-Stage Timeline ── */}
-        {placedOrders.length > 0 && (
+        {/* ── Current Order Live Tracker with Multi-Stage Timeline (Table Only) ── */}
+        {!isExploreMode && placedOrders.length > 0 && (
           <div className="mp-active-orders-wrap">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
               <h3 style={{ fontFamily: "var(--font-serif)", fontSize: "19px", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
@@ -769,13 +789,13 @@ function MenuPage() {
         />
 
         {menuError && (
-          <div style={{ backgroundColor: "#FAF1E8", color: "#8C4835", padding: "10px 14px", borderRadius: "8px", marginBottom: 16 }}>
+          <div style={{ backgroundColor: "#F4ECE3", color: "#8D5140", padding: "10px 14px", borderRadius: "8px", marginBottom: 16 }}>
             {menuError}
           </div>
         )}
 
         {/* ── Main Layout: Menu Grid + Desktop Cart ── */}
-        <div className="mp-layout-grid">
+        <div className={`mp-layout-grid ${isExploreMode ? "mp-layout-single" : ""}`}>
           {/* Menu Items */}
           <section>
             {isLoadingMenu ? (
@@ -784,7 +804,7 @@ function MenuPage() {
                 <p>Loading handcrafted menu...</p>
               </div>
             ) : filteredMenu.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "60px 20px", backgroundColor: "#FFFFFF", borderRadius: "var(--radius-lg)", border: "1px solid var(--cafe-border)" }}>
+              <div style={{ textAlign: "center", padding: "60px 20px", backgroundColor: "var(--cafe-card-bg)", borderRadius: "var(--radius-lg)", border: "1px solid var(--cafe-border)" }}>
                 <Coffee size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
                 <h3 style={{ fontSize: "17px", color: "var(--cafe-text-main)", marginBottom: 4 }}>No matching items found</h3>
                 <p style={{ fontSize: "13px", color: "var(--cafe-text-muted)" }}>Try searching for another brew or clearing your active filters.</p>
@@ -800,30 +820,33 @@ function MenuPage() {
                     onIncrease={handleIncrease}
                     onDecrease={handleDecrease}
                     cartQuantity={cartQuantityById.get(item.id) || 0}
+                    isExploreMode={isExploreMode}
                   />
                 ))}
               </div>
             )}
           </section>
 
-          {/* Desktop Cart Aside */}
-          <Cart
-            items={cart.items}
-            subtotalPaise={subtotalPaise}
-            totalPaise={subtotalPaise}
-            onIncrease={handleIncrease}
-            onDecrease={handleDecrease}
-            onRemove={handleRemove}
-            onClear={handleClearCart}
-            onProceed={handleProceed}
-            message={cartMessage}
-            isPlacingOrder={isPlacingOrder}
-          />
+          {/* Desktop Cart Aside (Dine-in mode only) */}
+          {!isExploreMode && (
+            <Cart
+              items={cart.items}
+              subtotalPaise={subtotalPaise}
+              totalPaise={subtotalPaise}
+              onIncrease={handleIncrease}
+              onDecrease={handleDecrease}
+              onRemove={handleRemove}
+              onClear={handleClearCart}
+              onProceed={handleProceed}
+              message={cartMessage}
+              isPlacingOrder={isPlacingOrder}
+            />
+          )}
         </div>
       </div>
 
-      {/* ── Mobile Floating Cart Bar ── */}
-      {cart.items.length > 0 && (
+      {/* ── Mobile Floating Cart Bar (Dine-in only) ── */}
+      {!isExploreMode && cart.items.length > 0 && (
         <div className="mp-mobile-cart-bar" onClick={() => setMobileCartOpen(true)}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ backgroundColor: "var(--cafe-terracotta)", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "12px" }}>
@@ -843,7 +866,7 @@ function MenuPage() {
       )}
 
       {/* ── Slide-over Cart Drawer for Mobile ── */}
-      {mobileCartOpen && (
+      {!isExploreMode && mobileCartOpen && (
         <div className="mp-drawer-overlay" onClick={() => setMobileCartOpen(false)}>
           <div className="mp-drawer-box" onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid var(--cafe-border)" }}>

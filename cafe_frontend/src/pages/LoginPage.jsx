@@ -9,7 +9,6 @@ import {
   googleAuthApi,
 } from "../services/adminApi";
 import {
-  Coffee,
   User,
   Lock,
   Mail,
@@ -22,6 +21,7 @@ import {
   UserPlus,
   LogIn,
 } from "lucide-react";
+import ArtisanLogo from "../components/ArtisanLogo";
 import "./LoginPage.css";
 
 export default function LoginPage() {
@@ -243,7 +243,7 @@ export default function LoginPage() {
         {/* Brand crest */}
         <div className="lp-crest">
           <div className="lp-crest-icon">
-            <Coffee size={26} strokeWidth={1.8} />
+            <ArtisanLogo size={28} color="#FFFFFF" />
           </div>
           <h1 className="lp-brand-name">The Artisan Café</h1>
           <span className="lp-brand-tag">MANAGEMENT &amp; ADMIN PORTAL</span>

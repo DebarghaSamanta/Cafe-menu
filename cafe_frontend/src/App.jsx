@@ -1,24 +1,27 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 
-import MenuPage        from "./pages/MenuPage";
-import LoginPage       from "./pages/LoginPage";
-import ProtectedRoute  from "./components/ProtectedRoute";
+import LandingPage      from "./pages/LandingPage";
+import MenuPage         from "./pages/MenuPage";
+import LoginPage        from "./pages/LoginPage";
+import ProtectedRoute   from "./components/ProtectedRoute";
 
-import AdminLayout     from "./pages/admin/AdminLayout";
-import DashboardPage   from "./pages/admin/DashboardPage";
-import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
-import AdminMenuPage   from "./pages/admin/AdminMenuPage";
+import AdminLayout      from "./pages/admin/AdminLayout";
+import DashboardPage    from "./pages/admin/DashboardPage";
+import AdminOrdersPage  from "./pages/admin/AdminOrdersPage";
+import AdminMenuPage    from "./pages/admin/AdminMenuPage";
 import AdminInventoryPage from "./pages/admin/AdminInventoryPage";
-import AdminTablesPage from "./pages/admin/AdminTablesPage";
+import AdminTablesPage  from "./pages/admin/AdminTablesPage";
 
 export default function App() {
   const { isAuthenticated, isAdmin } = useAuth();
 
   return (
     <Routes>
+      {/* ── Public Landing Page ── */}
+      <Route path="/"     element={<LandingPage />} />
+
       {/* ── Customer Table Menu (Public via QR) ── */}
-      <Route path="/"     element={<MenuPage />} />
       <Route path="/menu" element={<MenuPage />} />
 
       {/* ── Admin Login ── */}
