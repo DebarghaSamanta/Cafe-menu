@@ -149,6 +149,7 @@ def get_menu(
         "price_paise": 1,
         "stock_quantity": 1,
         "is_available": 1,
+        "customization_groups": 1,
     }
 
     try:
@@ -179,6 +180,9 @@ def get_menu(
                     price=price_paise / 100,
                     stock_quantity=stock_qty,
                     is_available=is_avail,
+                    customization_groups=document.get(
+                        "customization_groups", []
+                    ),
                 )
             )
 

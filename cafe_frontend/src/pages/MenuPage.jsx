@@ -23,6 +23,7 @@ import MenuFilters from "../components/MenuFilters";
 import MenuItemCard from "../components/MenuItemCard";
 import Cart from "../components/Cart";
 import InvoiceModal from "../components/InvoiceModal";
+import CustomizationModal from "../components/CustomizationModal";
 import {
   Coffee,
   ShoppingBag,
@@ -101,6 +102,7 @@ function MenuPage() {
   const [cartMessage, setCartMessage] = useState("");
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [mobileCartOpen, setMobileCartOpen] = useState(false);
+  const [customizingItem, setCustomizingItem] = useState(null);
 
   // ─── Orders & Invoices ───────────────────────────────
   const [orderConfirmation, setOrderConfirmation] = useState(null);
@@ -300,10 +302,72 @@ function MenuPage() {
 
     setIsPlacingOrder(true);
     setCartMessage("");
+<<<<<<< HEAD
 
     const items = cart.items.map((item) => ({
       menu_item_id: item.id,
       quantity: item.quantity,
+=======
+  }
+
+
+  function handleDecrease(itemId) {
+    dispatch({
+      type: "DECREASE_ITEM",
+      itemId,
+    });
+
+    setCartMessage("");
+  }
+
+
+  function handleRemove(itemId) {
+    dispatch({
+      type: "REMOVE_ITEM",
+      itemId,
+    });
+
+    setCartMessage("");
+  }
+
+
+  function handleClearCart() {
+    dispatch({
+      type: "CLEAR_CART",
+    });
+
+    setCartMessage("");
+  }
+  function handleConfirmCustomization(item, customizations, unitPricePaise) {
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        ...item,
+        unit_price_paise: unitPricePaise,
+        customizations,
+      },
+    });
+
+    setCustomizingItem(null);
+    setCartMessage(`${item.name} added to cart.`);
+  }
+ function handleNewOrder() {
+    setOrderConfirmation(null);
+  }
+
+async function handleProceed() {
+    if (cart.items.length === 0) {
+        setCartMessage("Your cart is empty. Add at least one item before continuing.");
+        return;
+    }
+
+    const items = cart.items.map((item) => ({
+      menu_item_id: item.id,
+      quantity: item.quantity,
+      customizations: (item.customizations || []).map((c) => ({
+        group_id: c.group_id,
+        choice_ids: c.choices.map((choice) => choice.id),
+      })),
     }));
 
     try {
@@ -617,6 +681,7 @@ function MenuPage() {
                 },
               ];
 
+<<<<<<< HEAD
               return (
                 <div key={order.id} className="mp-active-order-card">
                   {/* Order Card Header */}
@@ -715,6 +780,13 @@ function MenuPage() {
         )}
 
         {/* ── Filter Bar & Search ── */}
+=======
+        <TableHeader
+          tableNumber={
+            table.table_number
+          }
+        />
+>>>>>>> origin/main
         <MenuFilters
           categories={categories}
           selectedCategory={selectedCategory}
@@ -757,6 +829,7 @@ function MenuPage() {
                     key={item.id}
                     item={item}
                     onAddToCart={handleAddToCart}
+                    onCustomize={setCustomizingItem}
                     onIncrease={handleIncrease}
                     onDecrease={handleDecrease}
                     cartQuantity={cartQuantityById.get(item.id) || 0}
@@ -994,6 +1067,15 @@ function MenuPage() {
       {/* ── Customer Invoice Modal ── */}
       {activeInvoice && (
         <InvoiceModal invoice={activeInvoice} onClose={() => setActiveInvoice(null)} />
+      )}
+
+      {/* ── Customization Modal ── */}
+      {customizingItem && (
+        <CustomizationModal
+          item={customizingItem}
+          onClose={() => setCustomizingItem(null)}
+          onConfirm={handleConfirmCustomization}
+        />
       )}
     </main>
   );

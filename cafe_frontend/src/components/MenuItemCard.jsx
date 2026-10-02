@@ -4,6 +4,7 @@ import { MAX_QUANTITY } from "../cart/cartReducer";
 function MenuItemCard({
   item,
   onAddToCart,
+  onCustomize,
   onIncrease,
   onDecrease,
   cartQuantity = 0,
@@ -12,6 +13,7 @@ function MenuItemCard({
   const isAvailable = Boolean(item.is_available) && stock > 0;
   const maxAllowed = Math.min(MAX_QUANTITY, stock);
   const isAtMaximum = cartQuantity >= maxAllowed;
+  const isCustomizable = (item.customization_groups?.length ?? 0) > 0;
 
   return (
     <article className={`mp-card ${!isAvailable ? "unavailable" : ""}`}>
@@ -91,10 +93,14 @@ function MenuItemCard({
               <button
                 type="button"
                 className="mp-add-btn"
-                onClick={() => onAddToCart(item)}
+                onClick={() =>
+                  isCustomizable && onCustomize
+                    ? onCustomize(item)
+                    : onAddToCart(item)
+                }
               >
                 <Plus size={14} strokeWidth={2.5} />
-                <span>Add</span>
+                <span>{isCustomizable ? "Customize" : "Add"}</span>
               </button>
             )}
           </div>

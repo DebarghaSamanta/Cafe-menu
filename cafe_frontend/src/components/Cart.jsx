@@ -108,11 +108,28 @@ function Cart({
         <>
           <div className="mp-cart-items-list">
             {items.map((item) => {
+              const lineKey = item.lineId || item.id;
               const isAtMax = item.quantity >= MAX_QUANTITY;
               return (
-                <div key={item.id} className="mp-cart-item-row">
+                <div key={lineKey} className="mp-cart-item-row">
                   <div className="mp-cart-item-info">
                     <div className="mp-cart-item-name">{item.name}</div>
+                    {item.customizations?.length > 0 && (
+                      <div
+                        style={{
+                          fontSize: "11.5px",
+                          color: "var(--cafe-terracotta)",
+                          fontStyle: "italic",
+                          marginTop: "2px",
+                        }}
+                      >
+                        {item.customizations
+                          .flatMap((group) =>
+                            group.choices.map((choice) => choice.label)
+                          )
+                          .join(", ")}
+                      </div>
+                    )}
                     <div className="mp-cart-item-rate">
                       {formatPrice(item.price_paise)} each &bull;{" "}
                       <strong>{formatPrice(item.price_paise * item.quantity)}</strong>
@@ -125,7 +142,7 @@ function Cart({
                         type="button"
                         className="mp-step-btn"
                         style={{ width: 22, height: 22 }}
-                        onClick={() => onDecrease(item.id)}
+                        onClick={() => onDecrease(lineKey)}
                       >
                         <Minus size={12} />
                       </button>
@@ -137,7 +154,7 @@ function Cart({
                         className="mp-step-btn"
                         style={{ width: 22, height: 22 }}
                         disabled={isAtMax}
-                        onClick={() => onIncrease(item.id)}
+                        onClick={() => onIncrease(lineKey)}
                       >
                         <Plus size={12} />
                       </button>
@@ -152,7 +169,7 @@ function Cart({
                         cursor: "pointer",
                         padding: 4,
                       }}
-                      onClick={() => onRemove(item.id)}
+                      onClick={() => onRemove(lineKey)}
                       title="Remove item"
                     >
                       <Trash2 size={15} />
