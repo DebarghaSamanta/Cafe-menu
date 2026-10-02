@@ -7,6 +7,7 @@ export const initialCartState = {
 
 function normalizeCartItem(item) {
   const price = Number(item.price);
+  const stock = item.stock_quantity !== undefined && item.stock_quantity !== null ? item.stock_quantity : 50;
 
   if (
     !item.id ||
@@ -22,7 +23,8 @@ function normalizeCartItem(item) {
     name: item.name,
     category: item.category,
     price_paise: Math.round(price * 100),
-    is_available: Boolean(item.is_available),
+    stock_quantity: stock,
+    is_available: Boolean(item.is_available) && stock > 0,
   };
 }
 
@@ -45,6 +47,8 @@ export function cartReducer(state, action) {
         (cartItem) => cartItem.id === item.id
       );
 
+      const maxAllowed = Math.min(MAX_QUANTITY, item.stock_quantity);
+
       // Item does not exist in cart yet.
       if (!existingItem) {
         return {
@@ -59,9 +63,9 @@ export function cartReducer(state, action) {
         };
       }
 
-      // Already at maximum.
+      // Already at maximum available stock or hard limit.
       if (
-        existingItem.quantity >= MAX_QUANTITY
+        existingItem.quantity >= maxAllowed
       ) {
         return state;
       }
@@ -94,8 +98,10 @@ export function cartReducer(state, action) {
             return item;
           }
 
+          const maxAllowed = Math.min(MAX_QUANTITY, item.stock_quantity !== undefined ? item.stock_quantity : MAX_QUANTITY);
+
           if (
-            item.quantity >= MAX_QUANTITY
+            item.quantity >= maxAllowed
           ) {
             return item;
           }

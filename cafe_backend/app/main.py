@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pymongo.errors import PyMongoError
 
 from app.db.mongodb import (
@@ -9,18 +10,16 @@ from app.db.mongodb import (
     ensure_database_structure,
     get_database,
 )
-from app.routers.orders import (
-    router as orders_router,
-)
+from app.routers.orders import router as orders_router
 from app.routers.menu import router as menu_router
 from app.routers.tables import router as tables_router
 from app.routers.auth import router as auth_router
 from app.routers.admin import router as admin_router
-from app.routers.admin_menu import router as admin_menu_router
+from app.routers.staff import router as staff_router
 
 from app.schemas.models import HealthResponse
 
-from fastapi.middleware.cors import CORSMiddleware
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     client = create_mongo_client()
@@ -43,7 +42,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Digital Cafe Backend",
-    version="0.3.0",
+    version="0.4.0",
     lifespan=lifespan,
 )
 
@@ -57,8 +56,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # =========================================================
 # ROUTERS
+#
+# Admin sub-routers (menu, orders, staff, tables) are all
+# registered inside app.routers.admin and inherit its
+# /api/admin prefix + require_admin guard.
 # =========================================================
 
 app.include_router(tables_router)
@@ -66,7 +70,7 @@ app.include_router(menu_router)
 app.include_router(orders_router)
 app.include_router(auth_router)
 app.include_router(admin_router)
-app.include_router(admin_menu_router)
+app.include_router(staff_router)
 
 # =========================================================
 # HEALTH

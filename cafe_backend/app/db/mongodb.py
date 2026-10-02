@@ -9,6 +9,7 @@ COLLECTIONS = (
     "menu_items",
     "orders",
     "users",
+    "invoices",
 )
 
 
@@ -109,5 +110,19 @@ def ensure_database_structure(db: Database) -> None:
         db.users,
         [("username", 1)],
         "uniq_username",
+        unique=True,
+    )
+
+    # Invoices
+    ensure_index(
+        db.invoices,
+        [("order_id", 1)],
+        "uniq_invoice_order_id",
+        unique=True,
+    )
+    ensure_index(
+        db.invoices,
+        [("invoice_number", 1)],
+        "uniq_invoice_number",
         unique=True,
     )

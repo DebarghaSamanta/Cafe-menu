@@ -1,0 +1,390 @@
+/* ── European Artisan Café Invoice & Receipt Modal ── */
+
+.inv-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(42, 23, 16, 0.45);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.inv-modal-box {
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border-dark);
+  border-radius: var(--radius-lg);
+  max-width: 560px;
+  width: 100%;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.inv-modal-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--cafe-border);
+  background-color: var(--cafe-bg);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.inv-modal-heading {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--cafe-text-main);
+  font-weight: 700;
+  margin: 0;
+}
+
+.inv-modal-sub {
+  font-size: 12px;
+  color: var(--cafe-text-muted);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+.inv-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inv-print-area {
+  padding: 24px 20px 40px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: #ECE5DA;
+  flex: 1;
+}
+
+/* ── Artisan Receipt Card ── */
+.inv-receipt-card {
+  width: 380px;
+  max-width: 100%;
+  height: auto;
+  min-height: min-content;
+  background-color: #FAF6F0;
+  border: 3px solid #4E2A1F;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(42, 23, 16, 0.12);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin: 0 auto;
+}
+
+.inv-inner-border {
+  border: 1px solid #C9BBA7;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+.inv-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.inv-brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #4E2A1F;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.inv-cafe-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2A1710;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.inv-cafe-sub {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #85746C;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+/* ── Meta Box ── */
+.inv-meta-box {
+  background-color: #F3EBE1;
+  border: 1px solid #E2D7C8;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inv-meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+}
+
+.inv-meta-lbl {
+  color: #85746C;
+  font-weight: 500;
+}
+
+.inv-meta-val {
+  color: #2A1710;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ── Table ── */
+.inv-table-wrap {
+  border: 1px solid #E2D7C8;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.inv-table th {
+  background-color: #4E2A1F;
+  color: #FFFFFF;
+  padding: 6px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+
+.inv-table td {
+  padding: 8px;
+  border-bottom: 1px solid #EAE0D2;
+  color: #2A1710;
+}
+
+.inv-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Totals Box ── */
+.inv-totals-box {
+  border-top: 1px dashed #C9BBA7;
+  padding-top: 10px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.inv-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6B564E;
+}
+
+.inv-grand-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6px;
+  border-top: 1px solid #E2D7C8;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #2A1710;
+}
+
+.inv-grand-amount {
+  color: #8C4835;
+  font-size: 19px;
+}
+
+/* ── Footer / Stamp ── */
+.inv-footer-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.inv-paid-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid #3F704D;
+  background-color: rgba(63, 112, 77, 0.08);
+  color: #3F704D;
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.inv-thankyou {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 11px;
+  color: #6B564E;
+  margin: 0;
+}
+
+.inv-motto {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #85746C;
+  margin: 0;
+}
+
+/* ── Strict Single-Page Print / PDF Media Query ── */
+@media print {
+  /* Hide whole app chrome */
+  body > #root {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+
+  .al-sidebar,
+  .al-topbar,
+  .al-footer,
+  .al-content,
+  .inv-modal-topbar {
+    display: none !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .inv-modal-overlay {
+    position: static !important;
+    inset: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .inv-modal-box {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  .inv-print-area {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .inv-receipt-card {
+    width: 105mm !important; /* Standard A6 invoice size */
+    max-width: 105mm !important;
+    margin: 0 auto !important;
+    box-shadow: none !important;
+    border: 2.5px solid #4E2A1F !important;
+    background-color: #FAF6F0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .inv-inner-border {
+    padding: 14px 12px !important;
+  }
+
+  .inv-cafe-name {
+    font-size: 20px !important;
+  }
+
+  .inv-table th {
+    padding: 3px 5px !important;
+    font-size: 8.5px !important;
+  }
+
+  .inv-table td {
+    padding: 4px 5px !important;
+    font-size: 10px !important;
+  }
+
+  .inv-totals-box {
+    padding-top: 6px !important;
+    margin-bottom: 8px !important;
+    gap: 3px !important;
+  }
+
+  .inv-total-row {
+    font-size: 10px !important;
+  }
+
+  .inv-grand-row {
+    font-size: 14px !important;
+    padding-top: 4px !important;
+  }
+
+  .inv-grand-amount {
+    font-size: 15px !important;
+  }
+
+  .inv-footer-area {
+    padding-top: 4px !important;
+    gap: 4px !important;
+  }
+
+  .inv-paid-stamp {
+    padding: 3px 10px !important;
+    font-size: 9.5px !important;
+  }
+}

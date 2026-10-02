@@ -1,0 +1,209 @@
+/* ── European Artisan Café Staff Layout Styling ── */
+
+.sl-root {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--cafe-bg);
+  color: var(--cafe-text-body);
+  font-family: var(--font-sans);
+}
+
+.sl-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background-color: var(--cafe-sidebar-bg);
+  border-right: 1px solid var(--cafe-border);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 16px 20px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.sl-brand {
+  padding: 0 10px 24px;
+  border-bottom: 1px solid var(--cafe-border);
+  margin-bottom: 20px;
+}
+
+.sl-brand-name {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--cafe-text-main);
+  letter-spacing: -0.01em;
+}
+
+.sl-brand-role {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--cafe-text-muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.sl-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sl-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  color: var(--cafe-text-body);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.sl-nav-item:hover {
+  background-color: rgba(78, 42, 31, 0.06);
+  color: var(--cafe-roast-dark);
+}
+
+.sl-nav-item.active {
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.sl-nav-item.active .sl-nav-icon {
+  color: #FFFFFF;
+}
+
+.sl-nav-icon {
+  color: var(--cafe-text-muted);
+}
+
+.sl-nav-divider {
+  height: 1px;
+  background-color: var(--cafe-border);
+  margin: 14px 8px;
+}
+
+.sl-nav-sub {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.sl-sidebar-footer {
+  margin-top: auto;
+}
+
+.sl-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--cafe-border);
+}
+
+.sl-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.sl-user-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sl-user-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cafe-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sl-user-role {
+  display: block;
+  font-size: 11px;
+  color: var(--cafe-text-muted);
+}
+
+.sl-logout {
+  background: none;
+  border: none;
+  color: var(--cafe-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sl-logout:hover {
+  background-color: rgba(160, 61, 61, 0.1);
+  color: var(--cafe-status-cancelled);
+}
+
+.sl-main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sl-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 36px;
+  border-bottom: 1px solid var(--cafe-border);
+  background-color: var(--cafe-bg);
+}
+
+.sl-tagline {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--cafe-text-muted);
+}
+
+.sl-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sl-clock-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--cafe-card-bg);
+  border: 1px solid var(--cafe-border);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--cafe-text-muted);
+}
+
+.sl-content {
+  flex: 1;
+  padding: 32px 36px;
+}
