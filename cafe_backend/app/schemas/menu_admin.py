@@ -1,6 +1,7 @@
-from typing import List, Optional
-
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
+
+from app.schemas.models import CustomizationGroup, CustomizationChoice
 
 
 class MenuSize(BaseModel):
@@ -65,7 +66,11 @@ class AdminMenuItemCreate(BaseModel):
 
     is_available: bool = True
 
-    customization: MenuCustomization = Field(
+    customization_groups: List[CustomizationGroup] = Field(
+        default_factory=list,
+    )
+
+    customization: Optional[MenuCustomization] = Field(
         default_factory=MenuCustomization,
     )
 
@@ -96,5 +101,7 @@ class AdminMenuItemUpdate(BaseModel):
     )
 
     is_available: Optional[bool] = None
+
+    customization_groups: Optional[List[CustomizationGroup]] = None
 
     customization: Optional[MenuCustomization] = None

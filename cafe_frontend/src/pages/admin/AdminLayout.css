@@ -496,13 +496,72 @@
 
 .ap-modal {
   background-color: var(--cafe-card-bg);
-  border: 1px solid var(--cafe-border-dark);
+  border: 1.5px solid var(--cafe-border-dark);
   border-radius: var(--radius-lg);
-  padding: 28px;
-  max-width: 480px;
+  padding: 26px 28px;
+  max-width: 620px;
+  max-height: min(90vh, 720px);
+  overflow-y: auto;
   width: 100%;
   box-shadow: var(--shadow-lg);
   animation: apModalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+/* ── Admin Customization Groups Editor ── */
+.ap-cg-section {
+  border-top: 1px solid var(--cafe-border);
+  padding-top: 16px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ap-cg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ap-cg-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cafe-text-main);
+  margin: 0;
+}
+
+.ap-cg-card {
+  background-color: #FAF6F0;
+  border: 1px solid var(--cafe-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ap-cg-top-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.ap-cg-choices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 8px;
+  border-left: 2px solid var(--cafe-peach-border);
+}
+
+.ap-cg-choice-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 32px;
+  gap: 8px;
+  align-items: center;
 }
 
 @keyframes apModalIn {

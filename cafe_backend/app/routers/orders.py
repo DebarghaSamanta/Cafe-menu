@@ -124,9 +124,12 @@ def create_order(
     # =====================================================
     # 3. Fetch latest menu data
     # =====================================================
-    menu_item_ids = list(
-        {line["menu_item_id"] for line in order_lines.values()}
-    )
+    requested_quantities: dict[str, int] = {}
+    for line in order_lines.values():
+        mid = line["menu_item_id"]
+        requested_quantities[mid] = requested_quantities.get(mid, 0) + line["quantity"]
+
+    menu_item_ids = list(requested_quantities.keys())
     menu_documents = list(
         db.menu_items.find(
             {
