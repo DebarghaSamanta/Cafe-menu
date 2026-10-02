@@ -368,6 +368,12 @@ def pay_customer_order(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
+    if order.get("status") == "cancelled":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot settle payment for an already cancelled order."
+        )
+
     if x_table_token:
         table = resolve_table_from_token(db, x_table_token)
         if str(order["table_id"]) != str(table["_id"]):

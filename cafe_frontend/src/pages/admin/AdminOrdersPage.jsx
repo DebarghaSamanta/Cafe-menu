@@ -132,13 +132,17 @@ export default function AdminOrdersPage() {
         };
       }
 
-      groups[tNum].orders.push(order);
-      groups[tNum].totalPaise += order.total_paise || 0;
-
       const isPaid = order.payment_status === "PAID" || order.status === "completed";
+      const isCancelled = order.status === "cancelled";
+
+      groups[tNum].orders.push(order);
+      if (!isCancelled) {
+        groups[tNum].totalPaise += order.total_paise || 0;
+      }
+
       if (isPaid) {
         groups[tNum].paidPaise += order.total_paise || 0;
-      } else if (order.status !== "cancelled") {
+      } else if (!isCancelled) {
         groups[tNum].unpaidPaise += order.total_paise || 0;
       }
 
@@ -159,15 +163,6 @@ export default function AdminOrdersPage() {
       if (isNaN(numA) || isNaN(numB)) return String(a.tableNumber).localeCompare(String(b.tableNumber));
       return numA - numB;
     });
-  }, [orders]);
-
-  // Unique table numbers for quick filter bar
-  const availableTables = useMemo(() => {
-    const set = new Set();
-    orders.forEach((o) => {
-      if (o.table_number) set.add(o.table_number);
-    });
-    return Array.from(set).sort((a, b) => a - b);
   }, [orders]);
 
   function toggleTableExpand(tableNumber) {
@@ -249,36 +244,7 @@ export default function AdminOrdersPage() {
         }}
       >
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <h1 className="ap-title">Orders Management</h1>
-            {autoRefresh && (
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 5,
-                  backgroundColor: "rgba(63, 112, 77, 0.12)",
-                  color: "var(--cafe-status-ready)",
-                  border: "1px solid rgba(63, 112, 77, 0.3)",
-                  borderRadius: "var(--radius-full)",
-                  padding: "3px 10px",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                }}
-              >
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    backgroundColor: "var(--cafe-status-ready)",
-                    animation: "pulse 1.8s infinite",
-                  }}
-                />
-                <span>LIVE (4s)</span>
-              </span>
-            )}
-          </div>
+          <h1 className="ap-title">Orders Management</h1>
           <p className="ap-sub">
             {total} total order{total !== 1 ? "s" : ""} &bull; {tableGroups.length} active table{tableGroups.length !== 1 ? "s" : ""}
           </p>
@@ -328,55 +294,7 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* ── Table Quick Filter Bar ── */}
-      <div
-        className="ap-card"
-        style={{
-          padding: "10px 16px",
-          marginBottom: "14px",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          flexWrap: "wrap",
-        }}
-      >
-        <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", color: "var(--cafe-text-muted)", marginRight: 4 }}>
-          Quick Table Filter:
-        </span>
-        <button
-          type="button"
-          className={`ap-btn ${filterTable === "" ? "ap-btn-primary" : "ap-btn-ghost"}`}
-          style={{ padding: "4px 10px", fontSize: "11.5px", borderRadius: "var(--radius-full)" }}
-          onClick={() => setFilterTable("")}
-        >
-          All Tables ({total})
-        </button>
-        {availableTables.map((tNum) => {
-          const tOrders = orders.filter((o) => o.table_number === tNum);
-          const hasActive = tOrders.some((o) => ["pending", "confirmed", "preparing", "ready"].includes(o.status));
 
-          return (
-            <button
-              key={tNum}
-              type="button"
-              className={`ap-btn ${String(filterTable) === String(tNum) ? "ap-btn-primary" : "ap-btn-ghost"}`}
-              style={{
-                padding: "4px 10px",
-                fontSize: "11.5px",
-                borderRadius: "var(--radius-full)",
-                border: hasActive ? "1px solid var(--cafe-terracotta)" : "1px solid var(--cafe-border)",
-                backgroundColor: String(filterTable) === String(tNum) ? "var(--cafe-roast-primary)" : "#FFFFFF",
-              }}
-              onClick={() => setFilterTable(String(filterTable) === String(tNum) ? "" : String(tNum))}
-            >
-              <span>Table {tNum}</span>
-              <span style={{ fontSize: "10.5px", opacity: 0.8, marginLeft: 4 }}>
-                ({tOrders.length})
-              </span>
-            </button>
-          );
-        })}
-      </div>
 
       {/* ── Filters Bar ── */}
       <div
@@ -716,7 +634,7 @@ export default function AdminOrdersPage() {
                               </table>
 
                               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                                {!isPaid && (
+                                {!isPaid && order.status !== "cancelled" && (
                                   <button className="ap-btn ap-btn-success" style={{ padding: "6px 12px", fontSize: "12px" }} onClick={() => setPayModal(order)}>
                                     <Banknote size={14} />
                                     <span>Settle Cash Payment</span>
@@ -866,7 +784,7 @@ export default function AdminOrdersPage() {
                     </table>
 
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-                      {!isPaid && (
+                      {!isPaid && order.status !== "cancelled" && (
                         <button className="ap-btn ap-btn-success" onClick={() => setPayModal(order)}>
                           <Banknote size={15} />
                           <span>Settle Cash / Bill Payment</span>
