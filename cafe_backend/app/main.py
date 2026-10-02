@@ -19,6 +19,26 @@ from app.routers.admin import router as admin_router
 from app.schemas.models import HealthResponse
 
 
+import asyncio
+
+async def _order_expiry_background_task(app: FastAPI):
+    """
+    Background worker loop that runs every 60 seconds to automatically cancel
+    unpaid pending orders older than 30 minutes and restore inventory stock.
+    """
+    while True:
+        try:
+            await asyncio.sleep(60)
+            db = getattr(app.state, "db", None)
+            if db is not None:
+                from app.services.order_admin_service import auto_cancel_unpaid_pending_orders
+                auto_cancel_unpaid_pending_orders(db, timeout_minutes=30)
+        except asyncio.CancelledError:
+            break
+        except Exception:
+            pass
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     client = create_mongo_client()
@@ -33,7 +53,16 @@ async def lifespan(app: FastAPI):
         app.state.mongo_client = client
         app.state.db = db
 
+        # Start periodic 30-min unpaid order auto-cancel worker
+        expiry_task = asyncio.create_task(_order_expiry_background_task(app))
+
         yield
+
+        expiry_task.cancel()
+        try:
+            await expiry_task
+        except asyncio.CancelledError:
+            pass
 
     finally:
         client.close()

@@ -8,6 +8,7 @@ function MenuItemCard({
   onIncrease,
   onDecrease,
   cartQuantity = 0,
+  isExploreMode = false,
 }) {
   const stock = item.stock_quantity !== undefined && item.stock_quantity !== null ? item.stock_quantity : 50;
   const isAvailable = Boolean(item.is_available) && stock > 0;
@@ -36,18 +37,22 @@ function MenuItemCard({
       <div className="mp-card-bottom">
         <div>
           {!isAvailable ? (
-            <span className="mp-status-indicator unavail" style={{ fontWeight: 600, color: "#A03D3D" }}>
+            <span className="mp-status-indicator unavail" style={{ fontWeight: 600, color: "#993B3B" }}>
               ○ Out of Stock
+            </span>
+          ) : isExploreMode ? (
+            <span className="mp-status-indicator avail" style={{ fontWeight: 600, color: "#3D6A49" }}>
+              ● Available for Dine-in
             </span>
           ) : stock <= 5 ? (
             <span
               className="mp-status-indicator"
               style={{
-                color: "#C26D24",
-                backgroundColor: "rgba(194, 109, 36, 0.1)",
+                color: "#B66F24",
+                backgroundColor: "rgba(182, 111, 36, 0.08)",
                 padding: "2px 8px",
                 borderRadius: "4px",
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: "11.5px",
                 display: "inline-flex",
                 alignItems: "center",
@@ -57,13 +62,17 @@ function MenuItemCard({
               ● Only {stock} left!
             </span>
           ) : (
-            <span className="mp-status-indicator avail" style={{ fontWeight: 600, color: "#2D5237" }}>
-              ● In Stock ({stock})
+            <span className="mp-status-indicator avail" style={{ fontWeight: 600, color: "#3D6A49" }}>
+              ● In Stock
             </span>
           )}
         </div>
 
-        {isAvailable ? (
+        {isExploreMode ? (
+          <div className="mp-explore-tag">
+            <span>Dine-in Order via QR</span>
+          </div>
+        ) : isAvailable ? (
           <div>
             {cartQuantity > 0 ? (
               <div className="mp-stepper">

@@ -1,23 +1,27 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 
-import MenuPage        from "./pages/MenuPage";
-import LoginPage       from "./pages/LoginPage";
-import ProtectedRoute  from "./components/ProtectedRoute";
+import LandingPage      from "./pages/LandingPage";
+import MenuPage         from "./pages/MenuPage";
+import LoginPage        from "./pages/LoginPage";
+import ProtectedRoute   from "./components/ProtectedRoute";
 
-import AdminLayout     from "./pages/admin/AdminLayout";
-import DashboardPage   from "./pages/admin/DashboardPage";
-import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
-import AdminMenuPage   from "./pages/admin/AdminMenuPage";
-import AdminTablesPage from "./pages/admin/AdminTablesPage";
+import AdminLayout      from "./pages/admin/AdminLayout";
+import DashboardPage    from "./pages/admin/DashboardPage";
+import AdminOrdersPage  from "./pages/admin/AdminOrdersPage";
+import AdminMenuPage    from "./pages/admin/AdminMenuPage";
+import AdminInventoryPage from "./pages/admin/AdminInventoryPage";
+import AdminTablesPage  from "./pages/admin/AdminTablesPage";
 
 export default function App() {
   const { isAuthenticated, isAdmin } = useAuth();
 
   return (
     <Routes>
+      {/* ── Public Landing Page ── */}
+      <Route path="/"     element={<LandingPage />} />
+
       {/* ── Customer Table Menu (Public via QR) ── */}
-      <Route path="/"     element={<MenuPage />} />
       <Route path="/menu" element={<MenuPage />} />
 
       {/* ── Admin Login ── */}
@@ -43,8 +47,10 @@ export default function App() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="orders"    element={<AdminOrdersPage />} />
         <Route path="menu"      element={<AdminMenuPage />} />
+        <Route path="inventory" element={<AdminInventoryPage />} />
+        <Route path="stock"     element={<Navigate to="inventory" replace />} />
+        <Route path="orders"    element={<AdminOrdersPage />} />
         <Route path="tables"    element={<AdminTablesPage />} />
       </Route>
 

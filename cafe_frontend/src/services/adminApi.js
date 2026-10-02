@@ -2,10 +2,50 @@ import axios from "axios";
 
 const BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
+// Global Axios response interceptor for 401 session expiry
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("cafe_auth_token");
+      localStorage.removeItem("cafe_auth_user");
+      if (window.location.pathname.startsWith("/admin")) {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ─── Auth ──────────────────────────────────────────────
 export async function loginApi(username, password) {
   const res = await axios.post(`${BASE}/api/auth/login`, { username, password });
-  return res.data; // { access_token, token_type }
+  return res.data; // { access_token, token_type, user }
+}
+
+export async function sendOtpApi(email, purpose) {
+  const res = await axios.post(`${BASE}/api/auth/otp/send`, { email, purpose });
+  return res.data; // { message, expires_in_minutes }
+}
+
+export async function registerAdminApi(payload) {
+  const res = await axios.post(`${BASE}/api/auth/register-admin`, payload);
+  return res.data; // { access_token, token_type, user }
+}
+
+export async function loginOtpApi(email, otp) {
+  const res = await axios.post(`${BASE}/api/auth/login-otp`, { email, otp });
+  return res.data; // { access_token, token_type, user }
+}
+
+export async function resetPasswordApi(payload) {
+  const res = await axios.post(`${BASE}/api/auth/forgot-password/reset`, payload);
+  return res.data; // { message }
+}
+
+export async function googleAuthApi(credential) {
+  const res = await axios.post(`${BASE}/api/auth/google`, { credential });
+  return res.data; // { access_token, token_type, user }
 }
 
 // ─── Dashboard ─────────────────────────────────────────

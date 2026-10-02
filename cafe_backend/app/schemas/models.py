@@ -174,6 +174,7 @@ class OrderResponse(BaseModel):
     ready_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     cancelled_at: Optional[datetime] = None
+    cancel_reason: Optional[str] = None
     invoice_number: Optional[str] = None
 
     model_config = ConfigDict(extra="ignore")

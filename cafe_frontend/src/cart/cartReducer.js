@@ -135,22 +135,35 @@ export function cartReducer(state, action) {
     // ---------------------------------------------
 
     case "DECREASE_ITEM": {
+      const targetItem = state.items.find(
+        (item) => item.lineId === action.itemId || item.id === action.itemId
+      );
+
+      if (!targetItem) {
+        return state;
+      }
+
+      // If quantity is 1 or less, remove item completely from cart
+      if (targetItem.quantity <= 1) {
+        return {
+          ...state,
+          items: state.items.filter(
+            (item) => item.lineId !== targetItem.lineId
+          ),
+        };
+      }
+
+      // Otherwise, decrement quantity
       return {
         ...state,
-        items: state.items.map((item) => {
-          if (item.lineId !== action.itemId) {
-            return item;
-          }
-
-          if (item.quantity <= 1) {
-            return item;
-          }
-
-          return {
-            ...item,
-            quantity: item.quantity - 1,
-          };
-        }),
+        items: state.items.map((item) =>
+          item.lineId === targetItem.lineId
+            ? {
+                ...item,
+                quantity: item.quantity - 1,
+              }
+            : item
+        ),
       };
     }
 
