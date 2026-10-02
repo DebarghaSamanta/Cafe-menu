@@ -25,6 +25,20 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const [timeStr, setTimeStr] = useState("");
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (!e.target.closest(".al-user-menu-container")) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [menuOpen]);
+
   useEffect(() => {
     function updateClock() {
       const now = new Date();
@@ -117,16 +131,51 @@ export default function AdminLayout() {
 
           <div className="al-topbar-right">
             <span className="al-clock">{timeStr}</span>
-            <div
-              className="al-admin-pill"
-              onClick={handleLogout}
-              title="Click to Sign Out"
-            >
-              <div className="al-pill-avatar">
-                {user?.username?.[0]?.toUpperCase() || "A"}
+            <div className="al-user-menu-container" style={{ position: "relative" }}>
+              <div
+                className={`al-admin-pill ${menuOpen ? "active" : ""}`}
+                onClick={() => setMenuOpen((o) => !o)}
+                title="Account Settings & Sign Out"
+              >
+                <div className="al-pill-avatar">
+                  {user?.username?.[0]?.toUpperCase() || "A"}
+                </div>
+                <span className="al-pill-name">{user?.username || "Admin"}</span>
+                <ChevronDown
+                  size={14}
+                  style={{
+                    opacity: 0.7,
+                    transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s ease",
+                  }}
+                />
               </div>
-              <span className="al-pill-name">{user?.username || "Admin"}</span>
-              <ChevronDown size={14} style={{ opacity: 0.6 }} />
+
+              {/* User Dropdown Menu */}
+              {menuOpen && (
+                <div className="al-dropdown-menu">
+                  <div className="al-dropdown-header">
+                    <div className="al-dropdown-avatar">
+                      {user?.username?.[0]?.toUpperCase() || "A"}
+                    </div>
+                    <div className="al-dropdown-info">
+                      <span className="al-dropdown-name">{user?.username || "Administrator"}</span>
+                      <span className="al-dropdown-role">Portal Administrator</span>
+                    </div>
+                  </div>
+
+                  <div className="al-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    className="al-dropdown-item al-dropdown-logout"
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>

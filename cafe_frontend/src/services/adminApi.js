@@ -20,7 +20,32 @@ axios.interceptors.response.use(
 // ─── Auth ──────────────────────────────────────────────
 export async function loginApi(username, password) {
   const res = await axios.post(`${BASE}/api/auth/login`, { username, password });
-  return res.data; // { access_token, token_type }
+  return res.data; // { access_token, token_type, user }
+}
+
+export async function sendOtpApi(email, purpose) {
+  const res = await axios.post(`${BASE}/api/auth/otp/send`, { email, purpose });
+  return res.data; // { message, expires_in_minutes }
+}
+
+export async function registerAdminApi(payload) {
+  const res = await axios.post(`${BASE}/api/auth/register-admin`, payload);
+  return res.data; // { access_token, token_type, user }
+}
+
+export async function loginOtpApi(email, otp) {
+  const res = await axios.post(`${BASE}/api/auth/login-otp`, { email, otp });
+  return res.data; // { access_token, token_type, user }
+}
+
+export async function resetPasswordApi(payload) {
+  const res = await axios.post(`${BASE}/api/auth/forgot-password/reset`, payload);
+  return res.data; // { message }
+}
+
+export async function googleAuthApi(credential) {
+  const res = await axios.post(`${BASE}/api/auth/google`, { credential });
+  return res.data; // { access_token, token_type, user }
 }
 
 // ─── Dashboard ─────────────────────────────────────────

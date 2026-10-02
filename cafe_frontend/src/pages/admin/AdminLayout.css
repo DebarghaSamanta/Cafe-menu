@@ -258,6 +258,109 @@
   color: var(--cafe-text-main);
 }
 
+/* ── User Profile Dropdown ── */
+.al-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--cafe-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px -5px rgba(78, 42, 31, 0.12), 0 8px 10px -6px rgba(78, 42, 31, 0.08);
+  padding: 8px 0;
+  z-index: 100;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.al-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 8px;
+}
+
+.al-dropdown-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--cafe-roast-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.al-dropdown-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.al-dropdown-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cafe-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.al-dropdown-role {
+  font-size: 11px;
+  color: var(--cafe-text-muted);
+}
+
+.al-dropdown-divider {
+  height: 1px;
+  background-color: var(--cafe-border);
+  margin: 6px 0;
+}
+
+.al-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cafe-text-main);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+
+.al-dropdown-item:hover {
+  background-color: var(--cafe-peach-light);
+}
+
+.al-dropdown-logout {
+  color: var(--cafe-status-cancelled);
+  font-weight: 600;
+}
+
+.al-dropdown-logout:hover {
+  background-color: rgba(160, 61, 61, 0.08);
+  color: #802020;
+}
+
 .al-content {
   flex: 1;
   padding: 32px 36px;

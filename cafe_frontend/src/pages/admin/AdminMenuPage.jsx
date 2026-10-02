@@ -347,9 +347,9 @@ export default function AdminMenuPage() {
         }}
       >
         <div>
-          <h1 className="ap-title">Menu, Customizations &amp; Inventory</h1>
+          <h1 className="ap-title">Menu &amp; Customizations</h1>
           <p className="ap-sub">
-            {items.length} artisan items &bull; Live inventory numbers &amp; customizable option pricing
+            {items.length} artisan items &bull; Customizable option pricing &amp; menu configuration
           </p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -469,9 +469,8 @@ export default function AdminMenuPage() {
                 <thead>
                   <tr>
                     <th>Item Details &amp; Customizations</th>
-                    <th style={{ width: "110px" }}>Base Price</th>
-                    <th style={{ width: "140px" }}>Live Stock</th>
-                    <th style={{ width: "120px" }}>Status</th>
+                    <th style={{ width: "120px" }}>Base Price</th>
+                    <th style={{ width: "130px" }}>Status</th>
                     <th style={{ textAlign: "right", width: "120px" }}>
                       Actions
                     </th>
@@ -553,60 +552,6 @@ export default function AdminMenuPage() {
                           }}
                         >
                           {fmt(item.price_paise)}
-                        </td>
-
-                        {/* Numeric Stock Adjuster */}
-                        <td>
-                          <div
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 8,
-                              backgroundColor: "#F8F4EE",
-                              border: "1px solid var(--cafe-border)",
-                              borderRadius: "8px",
-                              padding: "3px 6px",
-                            }}
-                          >
-                            <button
-                              type="button"
-                              className="ap-btn ap-btn-ghost"
-                              style={{ padding: "2px 6px", height: "24px" }}
-                              onClick={() => adjustStock(item, -1)}
-                              disabled={stock <= 0}
-                              title="Decrease stock by 1"
-                            >
-                              <Minus size={12} />
-                            </button>
-
-                            <span
-                              style={{
-                                fontFamily: "var(--font-mono)",
-                                fontWeight: 700,
-                                fontSize: "13px",
-                                minWidth: "30px",
-                                textAlign: "center",
-                                color:
-                                  stock <= 0
-                                    ? "#A03D3D"
-                                    : stock <= 5
-                                    ? "#C26D24"
-                                    : "var(--cafe-text-main)",
-                              }}
-                            >
-                              {stock}
-                            </span>
-
-                            <button
-                              type="button"
-                              className="ap-btn ap-btn-ghost"
-                              style={{ padding: "2px 6px", height: "24px" }}
-                              onClick={() => adjustStock(item, +5)}
-                              title="Add 5 units to stock"
-                            >
-                              <Plus size={12} />
-                            </button>
-                          </div>
                         </td>
 
                         {/* Availability Pill */}
