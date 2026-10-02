@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # JWT settings
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 60 * 24 * 7  # 7 days for persistent session
 
 
 settings = Settings()

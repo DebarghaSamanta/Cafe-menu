@@ -2,6 +2,21 @@ import axios from "axios";
 
 const BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
+// Global Axios response interceptor for 401 session expiry
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("cafe_auth_token");
+      localStorage.removeItem("cafe_auth_user");
+      if (window.location.pathname.startsWith("/admin")) {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ─── Auth ──────────────────────────────────────────────
 export async function loginApi(username, password) {
   const res = await axios.post(`${BASE}/api/auth/login`, { username, password });
