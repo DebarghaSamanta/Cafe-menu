@@ -650,8 +650,22 @@ export default function AdminOrdersPage() {
                                   CASH DUE
                                 </span>
                               ) : (
-                                <span style={{ fontSize: "11px", fontWeight: 700, backgroundColor: "rgba(160, 61, 61, 0.12)", color: "#A03D3D", padding: "2px 8px", borderRadius: "4px" }}>
-                                  UNPAID
+                                <>
+                                  <span style={{ fontSize: "11px", fontWeight: 700, backgroundColor: "rgba(160, 61, 61, 0.12)", color: "#A03D3D", padding: "2px 8px", borderRadius: "4px" }}>
+                                    UNPAID
+                                  </span>
+                                  {order.status === "pending" && (
+                                    <span style={{ fontSize: "11px", fontWeight: 600, backgroundColor: "rgba(194, 109, 36, 0.12)", color: "#C26D24", padding: "2px 8px", borderRadius: "4px", display: "inline-flex", alignItems: "center", gap: 3 }}>
+                                      <Clock size={11} />
+                                      <span>Expires in {Math.max(0, 30 - Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60000))}m</span>
+                                    </span>
+                                  )}
+                                </>
+                              )}
+
+                              {order.status === "cancelled" && order.cancel_reason && (
+                                <span style={{ fontSize: "11px", fontWeight: 600, backgroundColor: "rgba(160, 61, 61, 0.08)", color: "#A03D3D", padding: "2px 8px", borderRadius: "4px" }}>
+                                  {order.cancel_reason.includes("30") ? "Auto-Expired (Unpaid 30m)" : order.cancel_reason}
                                 </span>
                               )}
 
@@ -781,8 +795,22 @@ export default function AdminOrdersPage() {
                           CASH DUE
                         </span>
                       ) : (
-                        <span style={{ fontSize: "11px", fontWeight: 700, backgroundColor: "rgba(160, 61, 61, 0.12)", color: "#A03D3D", padding: "2px 8px", borderRadius: "4px" }}>
-                          UNPAID
+                        <>
+                          <span style={{ fontSize: "11px", fontWeight: 700, backgroundColor: "rgba(160, 61, 61, 0.12)", color: "#A03D3D", padding: "2px 8px", borderRadius: "4px" }}>
+                            UNPAID
+                          </span>
+                          {order.status === "pending" && (
+                            <span style={{ fontSize: "11px", fontWeight: 600, backgroundColor: "rgba(194, 109, 36, 0.12)", color: "#C26D24", padding: "2px 8px", borderRadius: "4px", display: "inline-flex", alignItems: "center", gap: 3 }}>
+                              <Clock size={11} />
+                              <span>Expires in {Math.max(0, 30 - Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60000))}m</span>
+                            </span>
+                          )}
+                        </>
+                      )}
+
+                      {order.status === "cancelled" && order.cancel_reason && (
+                        <span style={{ fontSize: "11px", fontWeight: 600, backgroundColor: "rgba(160, 61, 61, 0.08)", color: "#A03D3D", padding: "2px 8px", borderRadius: "4px" }}>
+                          {order.cancel_reason.includes("30") ? "Auto-Expired (Unpaid 30m)" : order.cancel_reason}
                         </span>
                       )}
 

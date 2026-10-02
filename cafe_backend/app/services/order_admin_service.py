@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 from bson import ObjectId
@@ -38,8 +38,64 @@ def _serialize_order(order: dict) -> AdminOrderResponse:
         ready_at=order.get("ready_at"),
         completed_at=order.get("completed_at"),
         cancelled_at=order.get("cancelled_at"),
+        cancel_reason=order.get("cancel_reason"),
         invoice_number=order.get("invoice_number"),
     )
+
+
+def auto_cancel_unpaid_pending_orders(db, timeout_minutes: int = 30) -> int:
+    """
+    Find all orders that are still in 'pending' status with 'unpaid' payment status
+    and were created more than `timeout_minutes` ago.
+    Automatically transition them to 'cancelled' and restore the stock quantity to menu items.
+    """
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(minutes=timeout_minutes)
+
+    expired_orders = list(
+        db.orders.find({
+            "status": "pending",
+            "payment_status": {"$in": ["unpaid", None]},
+            "created_at": {"$lt": cutoff},
+        })
+    )
+
+    if not expired_orders:
+        return 0
+
+    cancelled_count = 0
+    for order in expired_orders:
+        order_id = order["_id"]
+
+        # Restore inventory stock for each item in the cancelled order
+        items = order.get("items", [])
+        for item in items:
+            menu_item_id = item.get("menu_item_id")
+            quantity = item.get("quantity", 1)
+            if menu_item_id and quantity > 0:
+                db.menu_items.update_one(
+                    {"_id": menu_item_id},
+                    {
+                        "$inc": {"stock_quantity": quantity},
+                        "$set": {"is_available": True},
+                    },
+                )
+
+        # Mark order as auto-cancelled
+        db.orders.update_one(
+            {"_id": order_id},
+            {
+                "$set": {
+                    "status": "cancelled",
+                    "cancelled_at": now,
+                    "cancel_reason": f"Auto-cancelled: Payment timeout after {timeout_minutes} minutes",
+                    "updated_at": now,
+                }
+            },
+        )
+        cancelled_count += 1
+
+    return cancelled_count
 
 
 def list_orders(
@@ -53,7 +109,10 @@ def list_orders(
 ) -> AdminOrderListResponse:
     """
     Return a paginated list of orders with optional filters.
+    Performs real-time cleanup of expired unpaid pending orders before fetching.
     """
+    # Clean up any pending unpaid orders older than 30 minutes
+    auto_cancel_unpaid_pending_orders(db, timeout_minutes=30)
 
     query: dict = {}
 
@@ -116,7 +175,6 @@ def get_order(db, order_id: str) -> AdminOrderResponse:
     """
     Return a single order by its ID.
     """
-
     doc = db.orders.find_one({"_id": order_id})
 
     if doc is None:
@@ -195,6 +253,21 @@ def update_order_status(
 
     if new_status == OrderStatus.COMPLETED:
         set_fields["payment_status"] = "PAID"
+
+    # If cancelling, replenish the stock back to menu inventory
+    if new_status == OrderStatus.CANCELLED and current_status != OrderStatus.COMPLETED:
+        items = doc.get("items", [])
+        for item in items:
+            menu_item_id = item.get("menu_item_id")
+            quantity = item.get("quantity", 1)
+            if menu_item_id and quantity > 0:
+                db.menu_items.update_one(
+                    {"_id": menu_item_id},
+                    {
+                        "$inc": {"stock_quantity": quantity},
+                        "$set": {"is_available": True},
+                    },
+                )
 
     db.orders.update_one(
         {"_id": order_id},

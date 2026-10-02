@@ -335,6 +335,7 @@ def _serialize_customer_order(order: dict) -> OrderResponse:
         ready_at=order.get("ready_at"),
         completed_at=order.get("completed_at"),
         cancelled_at=order.get("cancelled_at"),
+        cancel_reason=order.get("cancel_reason"),
         invoice_number=order.get("invoice_number"),
     )
 
