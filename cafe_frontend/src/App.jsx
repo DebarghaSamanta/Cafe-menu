@@ -9,6 +9,7 @@ import AdminLayout     from "./pages/admin/AdminLayout";
 import DashboardPage   from "./pages/admin/DashboardPage";
 import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
 import AdminMenuPage   from "./pages/admin/AdminMenuPage";
+import AdminInventoryPage from "./pages/admin/AdminInventoryPage";
 import AdminTablesPage from "./pages/admin/AdminTablesPage";
 
 export default function App() {
@@ -43,8 +44,10 @@ export default function App() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="orders"    element={<AdminOrdersPage />} />
         <Route path="menu"      element={<AdminMenuPage />} />
+        <Route path="inventory" element={<AdminInventoryPage />} />
+        <Route path="stock"     element={<Navigate to="inventory" replace />} />
+        <Route path="orders"    element={<AdminOrdersPage />} />
         <Route path="tables"    element={<AdminTablesPage />} />
       </Route>
 

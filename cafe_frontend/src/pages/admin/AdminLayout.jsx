@@ -8,12 +8,14 @@ import {
   Grid,
   LogOut,
   ChevronDown,
+  PackageCheck,
 } from "lucide-react";
 import "./AdminLayout.css";
 
 const NAV = [
   { to: "/admin/dashboard", icon: LayoutDashboard, label: "Overview" },
-  { to: "/admin/menu",      icon: Coffee,          label: "Menu & Stock" },
+  { to: "/admin/menu",      icon: Coffee,          label: "Menu & Options" },
+  { to: "/admin/inventory", icon: PackageCheck,    label: "Live Stock & Refill" },
   { to: "/admin/orders",    icon: ClipboardList,   label: "Orders" },
   { to: "/admin/tables",    icon: Grid,            label: "Tables & QR" },
 ];

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   adminListMenu,
@@ -18,6 +19,7 @@ import {
   Layers,
   Sparkles,
   Sliders,
+  PackagePlus,
 } from "lucide-react";
 import "./AdminLayout.css";
 
@@ -332,10 +334,25 @@ export default function AdminMenuPage() {
             {items.length} artisan items &bull; Live inventory numbers &amp; customizable option pricing
           </p>
         </div>
-        <button className="ap-btn ap-btn-primary" onClick={openCreate}>
-          <Plus size={16} />
-          <span>Add Menu Item</span>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Link
+            to="/admin/inventory"
+            className="ap-btn ap-btn-ghost"
+            style={{
+              backgroundColor: "#FFFFFF",
+              border: "1px solid var(--cafe-border)",
+              color: "var(--cafe-roast-primary)",
+              fontWeight: 600,
+            }}
+          >
+            <PackagePlus size={16} color="var(--cafe-terracotta)" />
+            <span>Live Stock &amp; Refill</span>
+          </Link>
+          <button className="ap-btn ap-btn-primary" onClick={openCreate}>
+            <Plus size={16} />
+            <span>Add Menu Item</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Search Bar ── */}
