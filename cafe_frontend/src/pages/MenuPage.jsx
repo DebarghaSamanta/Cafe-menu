@@ -9,7 +9,6 @@ import {
   getMenu,
   getTableContext,
   createOrder,
-  getOrder,
   getCustomerInvoice,
   payCustomerOrder,
   getTableOrders,
@@ -37,8 +36,6 @@ import {
   CreditCard,
   QrCode,
   Banknote,
-  ChefHat,
-  ArrowRight,
   ShieldCheck,
   Check,
 } from "lucide-react";
@@ -292,52 +289,9 @@ function MenuPage() {
 
   function handleClearCart() {
     dispatch({ type: "CLEAR_CART" });
-  }
-
-  async function handleProceed() {
-    if (cart.items.length === 0) {
-      setCartMessage("Your cart is empty. Please add items before placing order.");
-      return;
-    }
-
-    setIsPlacingOrder(true);
-    setCartMessage("");
-<<<<<<< HEAD
-
-    const items = cart.items.map((item) => ({
-      menu_item_id: item.id,
-      quantity: item.quantity,
-=======
-  }
-
-
-  function handleDecrease(itemId) {
-    dispatch({
-      type: "DECREASE_ITEM",
-      itemId,
-    });
-
     setCartMessage("");
   }
 
-
-  function handleRemove(itemId) {
-    dispatch({
-      type: "REMOVE_ITEM",
-      itemId,
-    });
-
-    setCartMessage("");
-  }
-
-
-  function handleClearCart() {
-    dispatch({
-      type: "CLEAR_CART",
-    });
-
-    setCartMessage("");
-  }
   function handleConfirmCustomization(item, customizations, unitPricePaise) {
     dispatch({
       type: "ADD_ITEM",
@@ -351,15 +305,19 @@ function MenuPage() {
     setCustomizingItem(null);
     setCartMessage(`${item.name} added to cart.`);
   }
- function handleNewOrder() {
+
+  function handleNewOrder() {
     setOrderConfirmation(null);
   }
 
-async function handleProceed() {
+  async function handleProceed() {
     if (cart.items.length === 0) {
-        setCartMessage("Your cart is empty. Add at least one item before continuing.");
-        return;
+      setCartMessage("Your cart is empty. Add at least one item before continuing.");
+      return;
     }
+
+    setIsPlacingOrder(true);
+    setCartMessage("");
 
     const items = cart.items.map((item) => ({
       menu_item_id: item.id,
@@ -681,7 +639,6 @@ async function handleProceed() {
                 },
               ];
 
-<<<<<<< HEAD
               return (
                 <div key={order.id} className="mp-active-order-card">
                   {/* Order Card Header */}
@@ -780,13 +737,6 @@ async function handleProceed() {
         )}
 
         {/* ── Filter Bar & Search ── */}
-=======
-        <TableHeader
-          tableNumber={
-            table.table_number
-          }
-        />
->>>>>>> origin/main
         <MenuFilters
           categories={categories}
           selectedCategory={selectedCategory}
