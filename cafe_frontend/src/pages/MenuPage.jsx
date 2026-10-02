@@ -44,10 +44,23 @@ import {
 import "./MenuPage.css";
 
 function getTableTokenFromUrl() {
-  const hash = window.location.hash;
-  if (!hash) return null;
-  const params = new URLSearchParams(hash.substring(1));
-  return params.get("table_token");
+  if (window.location.hash) {
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    const token = params.get("table_token") || params.get("token");
+    if (token) {
+      sessionStorage.setItem("cafe_table_token", token);
+      return token;
+    }
+  }
+  if (window.location.search) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get("table_token") || searchParams.get("token");
+    if (token) {
+      sessionStorage.setItem("cafe_table_token", token);
+      return token;
+    }
+  }
+  return sessionStorage.getItem("cafe_table_token") || localStorage.getItem("cafe_table_token") || null;
 }
 
 function fmt(paise) {

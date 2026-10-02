@@ -1,19 +1,31 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { generateQRCodeSVG, drawQRCodeToCanvas } from "../utils/qrGenerator";
 import { Printer, Download, X, Coffee, Sparkles } from "lucide-react";
 import "./TableStandeeModal.css";
 
 export default function TableStandeeModal({ tableNumber, qrUrl, qrToken, onClose }) {
-  const canvasRef = useRef(null);
+  const [qrSvg, setQrSvg] = useState("");
   const cardRef = useRef(null);
 
   const formattedNum = String(tableNumber).padStart(2, "0");
+
+  useEffect(() => {
+    let isMounted = true;
+    if (qrUrl) {
+      generateQRCodeSVG(qrUrl, 220, "#2A1710", "#FFFFFF").then((svg) => {
+        if (isMounted) setQrSvg(svg);
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [qrUrl]);
 
   function handlePrint() {
     window.print();
   }
 
-  function handleDownloadPNG() {
+  async function handleDownloadPNG() {
     const canvas = document.createElement("canvas");
     const width = 800;
     const height = 1100;
@@ -56,8 +68,8 @@ export default function TableStandeeModal({ tableNumber, qrUrl, qrToken, onClose
 
     // Draw QR Code in Center
     const qrCanvas = document.createElement("canvas");
-    drawQRCodeToCanvas(qrCanvas, qrUrl, 380, "#2A1710", "#FFFFFF");
-    
+    await drawQRCodeToCanvas(qrCanvas, qrUrl, 380, "#2A1710", "#FFFFFF");
+
     // QR White Box Container with subtle shadow border
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(width / 2 - 210, 320, 420, 420);
@@ -96,8 +108,6 @@ export default function TableStandeeModal({ tableNumber, qrUrl, qrToken, onClose
     link.href = canvas.toDataURL("image/png");
     link.click();
   }
-
-  const qrSvg = generateQRCodeSVG(qrUrl, 220, "#2A1710", "#FFFFFF");
 
   return (
     <div className="ts-modal-overlay" onClick={onClose}>
@@ -144,10 +154,14 @@ export default function TableStandeeModal({ tableNumber, qrUrl, qrToken, onClose
 
               {/* QR Code Container */}
               <div className="ts-qr-wrapper">
-                <div
-                  className="ts-qr-svg"
-                  dangerouslySetInnerHTML={{ __html: qrSvg }}
-                />
+                {qrSvg ? (
+                  <div
+                    className="ts-qr-svg"
+                    dangerouslySetInnerHTML={{ __html: qrSvg }}
+                  />
+                ) : (
+                  <div className="ap-spinner" style={{ margin: "40px auto" }} />
+                )}
               </div>
 
               {/* Instruction */}

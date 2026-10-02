@@ -20,13 +20,24 @@ export default function LoginPage() {
     try {
       const data = await loginApi(form.username, form.password);
       const payload = JSON.parse(atob(data.access_token.split(".")[1]));
-      login(data.access_token, { id: payload.sub, username: payload.username, role: payload.role });
 
-      if (payload.role === "ADMIN") navigate("/admin/dashboard");
-      else if (payload.role === "STAFF") navigate("/staff/orders");
-      else setError("Unknown role. Please contact management.");
+      if (payload.role !== "ADMIN") {
+        setError("Access restricted. Admin credentials required.");
+        return;
+      }
+
+      login(data.access_token, {
+        id: payload.sub,
+        username: payload.username,
+        role: payload.role,
+      });
+
+      navigate("/admin/dashboard");
     } catch (err) {
-      setError(err.response?.data?.detail || "Invalid credentials. Please try again.");
+      setError(
+        err.response?.data?.detail ||
+          "Invalid admin credentials. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -41,13 +52,13 @@ export default function LoginPage() {
             <Coffee size={24} strokeWidth={1.8} />
           </div>
           <h1 className="lp-brand-name">The Artisan Café</h1>
-          <span className="lp-brand-tag">MANAGEMENT & KITCHEN PORTAL</span>
+          <span className="lp-brand-tag">ADMINISTRATION PORTAL</span>
         </div>
 
         {/* Card */}
         <div className="lp-card">
-          <h2 className="lp-title">Sign In</h2>
-          <p className="lp-sub">Enter your staff or administrator credentials</p>
+          <h2 className="lp-title">Administrator Sign In</h2>
+          <p className="lp-sub">Enter your manager or administrator credentials</p>
 
           <form onSubmit={handleSubmit} className="lp-form">
             <div className="lp-group">
@@ -59,8 +70,10 @@ export default function LoginPage() {
                   type="text"
                   autoComplete="username"
                   value={form.username}
-                  onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                  placeholder="e.g. admin or barista"
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, username: e.target.value }))
+                  }
+                  placeholder="e.g. admin"
                   required
                 />
               </div>
@@ -75,7 +88,9 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   value={form.password}
-                  onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, password: e.target.value }))
+                  }
                   placeholder="Enter your password"
                   required
                 />
@@ -89,8 +104,12 @@ export default function LoginPage() {
               </div>
             )}
 
-            <button type="submit" className="lp-submit-btn" disabled={loading}>
-              <span>{loading ? "Authenticating…" : "Enter Portal"}</span>
+            <button
+              type="submit"
+              className="lp-submit-btn"
+              disabled={loading}
+            >
+              <span>{loading ? "Authenticating…" : "Enter Admin Portal"}</span>
               <ArrowRight size={16} />
             </button>
           </form>
@@ -98,7 +117,7 @@ export default function LoginPage() {
 
         {/* Footer quote */}
         <div className="lp-footer">
-          <p>EST. 2024 &bull; ARTISAN ROASTERS &bull; ALL RIGHTS RESERVED</p>
+          <p>EST. 2024 &bull; ARTISAN ROASTERS &bull; 18 PARK STREET, KOLKATA</p>
         </div>
       </div>
     </div>

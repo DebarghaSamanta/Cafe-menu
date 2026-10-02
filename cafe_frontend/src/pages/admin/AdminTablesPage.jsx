@@ -335,11 +335,10 @@ export default function AdminTablesPage() {
                           background: table.is_active
                             ? "rgba(63, 112, 77, 0.1)"
                             : "rgba(160, 61, 61, 0.1)",
-                          border: `1px solid ${
-                            table.is_active
+                          border: `1px solid ${table.is_active
                               ? "rgba(63, 112, 77, 0.3)"
                               : "rgba(160, 61, 61, 0.3)"
-                          }`,
+                            }`,
                           color: table.is_active
                             ? "var(--cafe-status-ready)"
                             : "var(--cafe-status-cancelled)",
@@ -535,12 +534,12 @@ export default function AdminTablesPage() {
                                   textAlign: "left",
                                 }}
                                 onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#EFE6D8")
+                                (e.currentTarget.style.backgroundColor =
+                                  "#EFE6D8")
                                 }
                                 onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "transparent")
+                                (e.currentTarget.style.backgroundColor =
+                                  "transparent")
                                 }
                                 onClick={() => {
                                   setActiveMenuId(null);
@@ -570,12 +569,12 @@ export default function AdminTablesPage() {
                                   textAlign: "left",
                                 }}
                                 onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "rgba(140, 72, 53, 0.08)")
+                                (e.currentTarget.style.backgroundColor =
+                                  "rgba(140, 72, 53, 0.08)")
                                 }
                                 onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "transparent")
+                                (e.currentTarget.style.backgroundColor =
+                                  "transparent")
                                 }
                                 onClick={() => {
                                   setActiveMenuId(null);
@@ -613,12 +612,12 @@ export default function AdminTablesPage() {
                                   textAlign: "left",
                                 }}
                                 onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "rgba(160, 61, 61, 0.08)")
+                                (e.currentTarget.style.backgroundColor =
+                                  "rgba(160, 61, 61, 0.08)")
                                 }
                                 onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "transparent")
+                                (e.currentTarget.style.backgroundColor =
+                                  "transparent")
                                 }
                                 onClick={() => {
                                   setActiveMenuId(null);

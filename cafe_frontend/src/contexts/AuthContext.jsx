@@ -1,15 +1,18 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
 const TOKEN_KEY = "cafe_auth_token";
-const USER_KEY  = "cafe_auth_user";
+const USER_KEY = "cafe_auth_user";
 
 export function AuthProvider({ children }) {
-  const [token, setToken]   = useState(() => localStorage.getItem(TOKEN_KEY));
-  const [user, setUser]     = useState(() => {
-    try { return JSON.parse(localStorage.getItem(USER_KEY)); }
-    catch { return null; }
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(USER_KEY));
+    } catch {
+      return null;
+    }
   });
 
   const login = useCallback((accessToken, userData) => {
@@ -26,12 +29,27 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const isAdmin = user?.role === "ADMIN";
-  const isStaff = user?.role === "STAFF";
-  const isAuthenticated = !!token;
+  const isAdmin = Boolean(user && (user.role === "ADMIN" || user.role === "admin"));
+  const isAuthenticated = Boolean(token && isAdmin);
+
+  // If a stale or non-admin token exists in storage, auto-clear it
+  useEffect(() => {
+    if (token && !isAdmin) {
+      logout();
+    }
+  }, [token, isAdmin, logout]);
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, isAdmin, isStaff, isAuthenticated }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        login,
+        logout,
+        isAdmin,
+        isAuthenticated,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
