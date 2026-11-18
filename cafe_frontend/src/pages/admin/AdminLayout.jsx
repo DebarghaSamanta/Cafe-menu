@@ -9,6 +9,7 @@ import {
   LogOut,
   ChevronDown,
   PackageCheck,
+  MessageSquareQuote,
 } from "lucide-react";
 import "./AdminLayout.css";
 
@@ -18,6 +19,7 @@ const NAV = [
   { to: "/admin/inventory", icon: PackageCheck,    label: "Live Stock & Refill" },
   { to: "/admin/orders",    icon: ClipboardList,   label: "Orders" },
   { to: "/admin/tables",    icon: Grid,            label: "Tables & QR" },
+  { to: "/admin/reviews",   icon: MessageSquareQuote, label: "Guest Feedback" },
 ];
 
 export default function AdminLayout() {

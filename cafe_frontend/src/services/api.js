@@ -108,3 +108,28 @@ export async function getTableOrders(tableToken) {
   return parseResponse(response);
 }
 
+export async function getPublicReviews() {
+  const response = await fetch(`${API_BASE_URL}/api/reviews/public`, {
+    method: "GET",
+  });
+
+  return parseResponse(response);
+}
+
+export async function submitCustomerReview({ customer_name, table_number, rating, comment }) {
+  const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      customer_name,
+      table_number,
+      rating,
+      comment,
+    }),
+  });
+
+  return parseResponse(response);
+}
+

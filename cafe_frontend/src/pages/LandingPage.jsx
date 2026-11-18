@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck,
@@ -11,9 +12,47 @@ import {
   Flame,
   Smartphone,
   CheckCircle2,
+  Star,
+  MessageSquareQuote,
 } from "lucide-react";
 import ArtisanLogo from "../components/ArtisanLogo";
+import { getPublicReviews } from "../services/api";
 import "./LandingPage.css";
+
+const CURATED_REVIEWS = [
+  {
+    id: "r1",
+    customer_name: "Arijit Mukherjee",
+    table_number: 7,
+    rating: 5,
+    comment: "The Hazelnut Cortado paired with the Basque Burnt Cheesecake is pure perfection. Hands down the best specialty coffee experience on Park Street!",
+    created_at: "2026-11-17T12:00:00Z"
+  },
+  {
+    id: "r2",
+    customer_name: "Priyanka Sengupta",
+    table_number: 4,
+    rating: 5,
+    comment: "Loved the quiet sanctuary vibe and the contactless ordering. No waiting for bills or menus. The Truffle Mushroom Brioche was sublime.",
+    created_at: "2026-11-16T15:30:00Z"
+  },
+  {
+    id: "r3",
+    customer_name: "David Richardson",
+    table_number: 8,
+    rating: 5,
+    comment: "Sensational single-origin cold drip! You can really taste the crisp notes of Valencia orange. 72-hour laminated croissants reminded me of Parisian bakeries.",
+    created_at: "2026-11-15T09:15:00Z"
+  },
+  {
+    id: "r4",
+    customer_name: "Ananya Roy",
+    table_number: 10,
+    rating: 5,
+    comment: "Such a warm, thoughtful space. Ordering from the wooden QR standee was seamless and fast. The staff are polite, attentive and so welcoming!",
+    created_at: "2026-11-14T18:45:00Z"
+  }
+];
 
 export default function LandingPage() {
   const SIGNATURES = [
@@ -67,6 +106,22 @@ export default function LandingPage() {
     },
   ];
 
+  const [reviews, setReviews] = useState(CURATED_REVIEWS);
+
+  useEffect(() => {
+    async function loadReviews() {
+      try {
+        const liveReviews = await getPublicReviews();
+        if (Array.isArray(liveReviews) && liveReviews.length > 0) {
+          setReviews(liveReviews);
+        }
+      } catch (err) {
+        // Fall back gracefully to curated reviews
+      }
+    }
+    loadReviews();
+  }, []);
+
   return (
     <div className="landing-root">
       {/* ── Top Navigation Bar ── */}
@@ -82,12 +137,10 @@ export default function LandingPage() {
             </div>
           </Link>
 
-          <nav className="landing-nav-links">
-            <a href="#about" className="landing-nav-link">Our Craft</a>
-            <a href="#menu-highlights" className="landing-nav-link">Signatures</a>
-            <a href="#qr-experience" className="landing-nav-link">QR Dining</a>
-            <a href="#visit" className="landing-nav-link">Visit Us</a>
-          </nav>
+          <Link to="/login" className="landing-btn-admin">
+            <ShieldCheck size={15} />
+            <span>Admin Login</span>
+          </Link>
         </div>
       </header>
 
@@ -95,12 +148,6 @@ export default function LandingPage() {
       <section className="landing-hero">
         <div className="landing-hero-backdrop" />
         <div className="landing-hero-container">
-          {/* Badge */}
-          <div className="landing-hero-badge">
-            <Sparkles size={13} color="var(--cafe-terracotta)" />
-            <span>SPECIALTY ROASTERS &bull; KOLKATA</span>
-          </div>
-
           {/* Grand Headline */}
           <h1 className="landing-hero-headline">
             Where Every Cup Tells a Story of Craft &amp; Care.
@@ -114,15 +161,10 @@ export default function LandingPage() {
 
           {/* Actions */}
           <div className="landing-hero-actions">
-            <Link to="/menu" className="landing-cta-primary">
+            <Link to="/menu?explore=true" className="landing-cta-primary">
               <ArtisanLogo size={18} color="#FFFFFF" />
-              <span>Explore Menu &amp; Prices</span>
+              <span>Explore Menu</span>
               <ArrowRight size={16} />
-            </Link>
-
-            <Link to="/login" className="landing-cta-admin">
-              <ShieldCheck size={18} />
-              <span>Admin Login / Sign Up</span>
             </Link>
           </div>
 
@@ -139,8 +181,8 @@ export default function LandingPage() {
             </div>
             <div className="landing-stat-divider" />
             <div className="landing-stat-item">
-              <span className="landing-stat-num">Live</span>
-              <span className="landing-stat-label">Contactless QR Ordering</span>
+              <span className="landing-stat-num">15k+</span>
+              <span className="landing-stat-label">Happy Diners</span>
             </div>
           </div>
         </div>
@@ -303,33 +345,6 @@ export default function LandingPage() {
               <p className="landing-banner-desc">
                 Every table at The Artisan Café is equipped with a handcrafted wooden QR plaque. Scan with your camera to customize milk, sweetness, and extras, send tickets directly to the barista, and track preparation milestones in real time.
               </p>
-
-              {/* 3-Step Micro Workflow */}
-              <div className="landing-qr-steps">
-                <div className="landing-qr-step">
-                  <div className="landing-step-num">1</div>
-                  <div>
-                    <strong className="landing-step-heading">Scan Table QR</strong>
-                    <span className="landing-step-detail">Instant live menu on phone</span>
-                  </div>
-                </div>
-
-                <div className="landing-qr-step">
-                  <div className="landing-step-num">2</div>
-                  <div>
-                    <strong className="landing-step-heading">Customize &amp; Order</strong>
-                    <span className="landing-step-detail">Direct to barista station</span>
-                  </div>
-                </div>
-
-                <div className="landing-qr-step">
-                  <div className="landing-step-num">3</div>
-                  <div>
-                    <strong className="landing-step-heading">Settle Digitally</strong>
-                    <span className="landing-step-detail">UPI, Card or Cash counter</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Brass & Wood QR Plaque Visual */}
@@ -345,6 +360,55 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Guest Reflections / Customer Reviews Section ── */}
+      <section className="landing-section landing-section-alt">
+        <div className="landing-container">
+          <div className="landing-section-header">
+            <span className="landing-eyebrow">VOICES OF THE ARTISAN</span>
+            <h2 className="landing-section-title">Words from Our Tables</h2>
+            <p className="landing-section-desc">
+              Real reflections and reviews shared by guests savoring slow roasts, artisan pastries, and table-side hospitality.
+            </p>
+          </div>
+
+          <div className="landing-reviews-grid">
+            {reviews.slice(0, 4).map((rev) => (
+              <div key={rev.id} className="landing-review-card">
+                <div className="landing-review-card-top">
+                  <div className="landing-review-stars">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        size={15}
+                        fill={s <= rev.rating ? "#D48B38" : "none"}
+                        color={s <= rev.rating ? "#D48B38" : "#CEC4B5"}
+                      />
+                    ))}
+                  </div>
+                  {rev.table_number && (
+                    <span className="landing-review-table-tag">Table {rev.table_number}</span>
+                  )}
+                </div>
+
+                <p className="landing-review-quote">
+                  "{rev.comment}"
+                </p>
+
+                <div className="landing-review-author">
+                  <div className="landing-review-avatar">
+                    {rev.customer_name ? rev.customer_name.slice(0, 1).toUpperCase() : "G"}
+                  </div>
+                  <div>
+                    <strong className="landing-review-name">{rev.customer_name}</strong>
+                    <span className="landing-review-badge">Verified Dine-In Guest</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

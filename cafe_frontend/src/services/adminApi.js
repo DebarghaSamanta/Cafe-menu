@@ -174,6 +174,22 @@ export async function adminDeleteTable(token, tableId) {
   return res.data;
 }
 
+// ─── Customer Feedback / Reviews ───────────────────────
+export async function adminGetReviews(token) {
+  const res = await axios.get(`${BASE}/api/admin/reviews`, { headers: auth(token) });
+  return res.data;
+}
+
+export async function adminUpdateReview(token, reviewId, data) {
+  const res = await axios.patch(`${BASE}/api/admin/reviews/${reviewId}`, data, { headers: auth(token) });
+  return res.data;
+}
+
+export async function adminDeleteReview(token, reviewId) {
+  const res = await axios.delete(`${BASE}/api/admin/reviews/${reviewId}`, { headers: auth(token) });
+  return res.data;
+}
+
 // ─── Helpers ───────────────────────────────────────────
 function auth(token) {
   return { Authorization: `Bearer ${token}` };

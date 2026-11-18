@@ -12,6 +12,7 @@ import AdminOrdersPage  from "./pages/admin/AdminOrdersPage";
 import AdminMenuPage    from "./pages/admin/AdminMenuPage";
 import AdminInventoryPage from "./pages/admin/AdminInventoryPage";
 import AdminTablesPage  from "./pages/admin/AdminTablesPage";
+import AdminReviewsPage from "./pages/admin/AdminReviewsPage";
 
 export default function App() {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="stock"     element={<Navigate to="inventory" replace />} />
         <Route path="orders"    element={<AdminOrdersPage />} />
         <Route path="tables"    element={<AdminTablesPage />} />
+        <Route path="reviews"   element={<AdminReviewsPage />} />
       </Route>
 
       {/* ── Fallback ── */}

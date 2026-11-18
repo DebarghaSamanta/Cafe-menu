@@ -12,6 +12,7 @@ import {
   getCustomerInvoice,
   payCustomerOrder,
   getTableOrders,
+  submitCustomerReview,
 } from "../services/api";
 import {
   cartReducer,
@@ -38,21 +39,28 @@ import {
   Banknote,
   ShieldCheck,
   Check,
+  Star,
+  MessageSquare,
 } from "lucide-react";
 import "./MenuPage.css";
 
 function getTableTokenFromUrl() {
-  if (window.location.hash) {
-    const params = new URLSearchParams(window.location.hash.substring(1));
-    const token = params.get("table_token") || params.get("token");
+  if (window.location.search) {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("explore") === "true") {
+      sessionStorage.removeItem("cafe_table_token");
+      localStorage.removeItem("cafe_table_token");
+      return null;
+    }
+    const token = searchParams.get("table_token") || searchParams.get("token");
     if (token) {
       sessionStorage.setItem("cafe_table_token", token);
       return token;
     }
   }
-  if (window.location.search) {
-    const searchParams = new URLSearchParams(window.location.search);
-    const token = searchParams.get("table_token") || searchParams.get("token");
+  if (window.location.hash) {
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    const token = params.get("table_token") || params.get("token");
     if (token) {
       sessionStorage.setItem("cafe_table_token", token);
       return token;
@@ -111,6 +119,38 @@ function MenuPage() {
   const [selectedPayMethod, setSelectedPayMethod] = useState("upi");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+
+  // ─── Table Feedback / Review State ──────────────────
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+
+  async function handleReviewSubmit(e) {
+    e.preventDefault();
+    if (!reviewComment.trim()) {
+      setReviewError("Please write a few words about your experience.");
+      return;
+    }
+    try {
+      setIsSubmittingReview(true);
+      setReviewError("");
+      await submitCustomerReview({
+        customer_name: reviewName.trim() || (table ? `Table ${table.table_number} Guest` : "Valued Guest"),
+        table_number: table?.table_number || null,
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+      });
+      setReviewSuccess(true);
+      setReviewComment("");
+    } catch (err) {
+      setReviewError(err.message || "Failed to submit review. Please try again.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  }
 
   // =====================================================
   // 1. RESOLVE TABLE CONTEXT FROM QR TOKEN
@@ -488,6 +528,96 @@ function MenuPage() {
   // =====================================================
   // RENDER: ORDER CONFIRMATION SCREEN
   // =====================================================
+  const isExploreMode = !table || !tableToken;
+  const hasPaidOrder = !isExploreMode && Boolean(table) && placedOrders.some((order) => order.payment_status === "PAID");
+
+  const renderFeedbackSection = () => (
+    <section className="mp-feedback-card">
+      <div className="mp-feedback-header">
+        <div className="mp-feedback-badge">
+          <Star size={13} fill="#B66F24" color="#B66F24" />
+          <span>VERIFIED GUEST REFLECTIONS</span>
+        </div>
+        <h3 className="mp-feedback-title">
+          How was your Table {table?.table_number} Experience?
+        </h3>
+        <p className="mp-feedback-desc">
+          Thank you for dining with us! Your feedback is shared with our baristas and helps curate our showcase reviews.
+        </p>
+      </div>
+
+      {reviewSuccess ? (
+        <div className="mp-feedback-success">
+          <CheckCircle2 size={36} color="#3D6A49" />
+          <h4>Thank you for your review!</h4>
+          <p>Your feedback has been saved and will appear in our guest reflections.</p>
+          <button
+            type="button"
+            className="mp-feedback-again-btn"
+            onClick={() => setReviewSuccess(false)}
+          >
+            Update Comment
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleReviewSubmit} className="mp-feedback-form">
+          {reviewError && <div className="mp-feedback-error">{reviewError}</div>}
+
+          {/* Star Rating Selector */}
+          <div className="mp-rating-selector">
+            <span className="mp-rating-label">Your Rating:</span>
+            <div className="mp-stars-interactive">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className="mp-star-btn"
+                  onClick={() => setReviewRating(star)}
+                >
+                  <Star
+                    size={24}
+                    fill={star <= reviewRating ? "#D48B38" : "none"}
+                    color={star <= reviewRating ? "#D48B38" : "#CEC4B5"}
+                  />
+                </button>
+              ))}
+              <span className="mp-rating-score">{reviewRating} of 5 Stars</span>
+            </div>
+          </div>
+
+          {/* Name & Comment Inputs */}
+          <div className="mp-feedback-inputs">
+            <input
+              type="text"
+              placeholder={`Your Name (optional - defaults to Table ${table?.table_number} Guest)`}
+              value={reviewName}
+              onChange={(e) => setReviewName(e.target.value)}
+              className="mp-feedback-input"
+              maxLength={60}
+            />
+
+            <textarea
+              placeholder="How was the coffee extraction, pastry freshness, and table service?"
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              className="mp-feedback-textarea"
+              rows={3}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="mp-feedback-submit-btn"
+            disabled={isSubmittingReview || !reviewComment.trim()}
+          >
+            {isSubmittingReview ? "Submitting..." : "Submit Table Review"}
+          </button>
+        </form>
+      )}
+    </section>
+  );
+
   if (orderConfirmation) {
     const isPaid = orderConfirmation.payment_status === "PAID";
     const isCashPending = orderConfirmation.isCashRequest || orderConfirmation.payment_status === "cash_pending";
@@ -570,13 +700,23 @@ function MenuPage() {
                 <span>Back to Menu &bull; Track Live Progress</span>
               </button>
             </div>
+
+            {/* Verified Review Only After Payment */}
+            {isPaid && (
+              <div style={{ marginTop: 24, textAlign: "left" }}>
+                {renderFeedbackSection()}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* ── Customer Invoice Modal ── */}
+        {activeInvoice && (
+          <InvoiceModal invoice={activeInvoice} onClose={() => setActiveInvoice(null)} />
+        )}
       </main>
     );
   }
-
-  const isExploreMode = !table || !tableToken;
 
   // =====================================================
   // MAIN CUSTOMER MENU UI
@@ -766,6 +906,13 @@ function MenuPage() {
                         );
                       })}
                     </div>
+
+                    {/* Verified Review Only After Payment Completed */}
+                    {isPaid && (
+                      <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px dashed var(--cafe-border)" }}>
+                        {renderFeedbackSection()}
+                      </div>
+                    )}
                   </div>
                 </div>
               );

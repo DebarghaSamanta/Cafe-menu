@@ -1109,3 +1109,205 @@
   color: var(--cafe-text-body, #4A3A34);
 }
 
+/* ── Table Feedback / Guest Review Section ── */
+.mp-feedback-card {
+  margin-top: 50px;
+  background-color: var(--cafe-card-bg, #FCFAF7);
+  border: 1.5px solid var(--cafe-border, #E2D7C8);
+  border-radius: 16px;
+  padding: 32px 28px;
+  box-shadow: 0 4px 18px rgba(56, 45, 38, 0.04);
+}
+
+.mp-feedback-header {
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto 24px;
+}
+
+.mp-feedback-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background-color: rgba(182, 111, 36, 0.1);
+  color: #B66F24;
+  border: 1px solid rgba(182, 111, 36, 0.25);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.mp-feedback-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cafe-roast-primary, #382D26);
+  margin: 0 0 6px;
+}
+
+.mp-feedback-desc {
+  font-size: 13.5px;
+  color: var(--cafe-text-muted, #82756C);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mp-feedback-form {
+  max-width: 580px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mp-rating-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #F8F4EE;
+  border: 1px solid var(--cafe-border, #E2D7C8);
+  border-radius: 10px;
+}
+
+.mp-rating-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cafe-text-main, #241D19);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mp-stars-interactive {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  transition: transform 0.15s ease;
+}
+
+.mp-star-btn:hover {
+  transform: scale(1.2);
+}
+
+.mp-rating-score {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--cafe-roast-primary, #382D26);
+  margin-left: 8px;
+}
+
+.mp-feedback-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mp-feedback-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--cafe-border, #E2D7C8);
+  border-radius: 8px;
+  font-size: 13.5px;
+  background-color: #FFFFFF;
+  color: var(--cafe-text-main, #241D19);
+  outline: none;
+  font-family: inherit;
+}
+
+.mp-feedback-input:focus,
+.mp-feedback-textarea:focus {
+  border-color: var(--cafe-terracotta, #8D5140);
+}
+
+.mp-feedback-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--cafe-border, #E2D7C8);
+  border-radius: 8px;
+  font-size: 13.5px;
+  background-color: #FFFFFF;
+  color: var(--cafe-text-main, #241D19);
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.mp-feedback-submit-btn {
+  padding: 12px 20px;
+  border-radius: 9999px;
+  background-color: var(--cafe-roast-primary, #382D26);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(56, 45, 38, 0.15);
+}
+
+.mp-feedback-submit-btn:hover:not(:disabled) {
+  background-color: var(--cafe-roast-hover, #2B221C);
+  transform: translateY(-1px);
+}
+
+.mp-feedback-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mp-feedback-success {
+  text-align: center;
+  padding: 24px 16px;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.mp-feedback-success h4 {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--cafe-roast-primary, #382D26);
+  margin: 12px 0 6px;
+}
+
+.mp-feedback-success p {
+  font-size: 13.5px;
+  color: var(--cafe-text-muted, #82756C);
+  margin: 0 0 18px;
+}
+
+.mp-feedback-again-btn {
+  padding: 7px 16px;
+  border-radius: 9999px;
+  background: none;
+  border: 1px solid var(--cafe-border-dark, #CEC4B5);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--cafe-text-body, #4A3A34);
+  cursor: pointer;
+}
+
+.mp-feedback-again-btn:hover {
+  background-color: #F8F4EE;
+}
+
+.mp-feedback-error {
+  background-color: rgba(160, 61, 61, 0.1);
+  border: 1px solid rgba(160, 61, 61, 0.3);
+  color: #A03D3D;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  text-align: center;
+}
+
