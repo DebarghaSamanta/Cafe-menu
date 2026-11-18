@@ -30,3 +30,6 @@ __pycache__/
 .env
 .idea/
 .vscode/
+
+# AI Session Logs
+AI_SESSION_LOG.md
