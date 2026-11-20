@@ -5,6 +5,7 @@ from app.routers.admin_menu import router as admin_menu_router
 from app.routers.admin_orders import router as admin_orders_router
 from app.routers.admin_tables import router as admin_tables_router
 from app.routers.admin_dashboard import router as admin_dashboard_router
+from app.routers.admin_reviews import router as admin_reviews_router
 
 
 router = APIRouter(
@@ -39,3 +40,4 @@ router.include_router(admin_menu_router)
 router.include_router(admin_orders_router)
 router.include_router(admin_tables_router)
 router.include_router(admin_dashboard_router)
+router.include_router(admin_reviews_router)

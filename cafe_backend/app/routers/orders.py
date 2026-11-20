@@ -124,9 +124,12 @@ def create_order(
     # =====================================================
     # 3. Fetch latest menu data
     # =====================================================
-    menu_item_ids = list(
-        {line["menu_item_id"] for line in order_lines.values()}
-    )
+    requested_quantities: dict[str, int] = {}
+    for line in order_lines.values():
+        mid = line["menu_item_id"]
+        requested_quantities[mid] = requested_quantities.get(mid, 0) + line["quantity"]
+
+    menu_item_ids = list(requested_quantities.keys())
     menu_documents = list(
         db.menu_items.find(
             {
@@ -332,6 +335,7 @@ def _serialize_customer_order(order: dict) -> OrderResponse:
         ready_at=order.get("ready_at"),
         completed_at=order.get("completed_at"),
         cancelled_at=order.get("cancelled_at"),
+        cancel_reason=order.get("cancel_reason"),
         invoice_number=order.get("invoice_number"),
     )
 
@@ -363,6 +367,12 @@ def pay_customer_order(
     order = db.orders.find_one({"_id": order_id})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.get("status") == "cancelled":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot settle payment for an already cancelled order."
+        )
 
     if x_table_token:
         table = resolve_table_from_token(db, x_table_token)

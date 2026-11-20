@@ -1,46 +1,46 @@
 /* ── European Artisan Café Design System ── */
 :root {
-  /* Palette: Espresso Roast, Cream, Warm Peach & Terracotta */
-  --cafe-bg: #F7F3EC;
-  --cafe-bg-alt: #EFE8DD;
-  --cafe-sidebar-bg: #EFE8DD;
-  --cafe-card-bg: #FFFFFF;
-  --cafe-card-glass: rgba(255, 255, 255, 0.78);
-  --cafe-border: #E2D7C8;
-  --cafe-border-dark: #C9BBA7;
+  /* Palette: Matte Espresso Roast, Warm Sand, Raw Clay & Terracotta */
+  --cafe-bg: #F5F2EB;
+  --cafe-bg-alt: #ECE7DF;
+  --cafe-sidebar-bg: #ECE7DF;
+  --cafe-card-bg: #FCFAF7;
+  --cafe-card-glass: rgba(252, 250, 247, 0.92);
+  --cafe-border: #E5DFD5;
+  --cafe-border-dark: #CEC4B5;
   
-  --cafe-roast-dark: #2A1710;
-  --cafe-roast-primary: #4E2A1F;
-  --cafe-roast-hover: #3D1F16;
-  --cafe-roast-active: #5C3225;
-  --cafe-terracotta: #8C4835;
-  --cafe-terracotta-dark: #6E2B1A;
+  --cafe-roast-dark: #221C18;
+  --cafe-roast-primary: #382D26;
+  --cafe-roast-hover: #2B221C;
+  --cafe-roast-active: #483A32;
+  --cafe-terracotta: #8D5140;
+  --cafe-terracotta-dark: #703C2E;
   
-  --cafe-peach-light: #FAF1E8;
-  --cafe-peach-border: #E8D3C1;
-  --cafe-caramel: #B87A4A;
-  --cafe-crema: #D4B996;
+  --cafe-peach-light: #F4ECE3;
+  --cafe-peach-border: #E2D5C6;
+  --cafe-caramel: #AC7245;
+  --cafe-crema: #CBB494;
 
-  --cafe-text-main: #2A1710;
-  --cafe-text-body: #4A3A34;
-  --cafe-text-muted: #85746C;
-  --cafe-text-light: #A89A92;
+  --cafe-text-main: #241D19;
+  --cafe-text-body: #4A3F38;
+  --cafe-text-muted: #82756C;
+  --cafe-text-light: #A3968C;
 
-  --cafe-status-pending: #C2782A;
-  --cafe-status-confirmed: #4A6E82;
-  --cafe-status-preparing: #8C4835;
-  --cafe-status-ready: #3F704D;
-  --cafe-status-completed: #2E5A36;
-  --cafe-status-cancelled: #A03D3D;
+  --cafe-status-pending: #B66F24;
+  --cafe-status-confirmed: #47687B;
+  --cafe-status-preparing: #8D5140;
+  --cafe-status-ready: #3D6A49;
+  --cafe-status-completed: #2A5432;
+  --cafe-status-cancelled: #993B3B;
 
   --font-serif: 'Playfair Display', 'Newsreader', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --shadow-sm: 0 1px 3px rgba(42, 23, 16, 0.04), 0 1px 2px rgba(42, 23, 16, 0.02);
-  --shadow-md: 0 4px 12px rgba(42, 23, 16, 0.06), 0 1px 3px rgba(42, 23, 16, 0.04);
-  --shadow-lg: 0 12px 28px rgba(42, 23, 16, 0.08), 0 4px 10px rgba(42, 23, 16, 0.03);
-  --shadow-glass: 0 8px 32px 0 rgba(42, 23, 16, 0.05);
+  --shadow-sm: 0 1px 2px rgba(34, 28, 24, 0.04);
+  --shadow-md: 0 3px 8px rgba(34, 28, 24, 0.05), 0 1px 2px rgba(34, 28, 24, 0.03);
+  --shadow-lg: 0 8px 20px rgba(34, 28, 24, 0.06), 0 2px 6px rgba(34, 28, 24, 0.03);
+  --shadow-glass: 0 6px 20px rgba(34, 28, 24, 0.04);
 
   --radius-sm: 6px;
   --radius-md: 10px;

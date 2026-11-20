@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { X, Plus, Check } from "lucide-react";
+import "./CustomizationModal.css";
 
 function formatPrice(paise) {
   return (paise / 100).toFixed(2);
@@ -7,14 +9,19 @@ function formatPrice(paise) {
 function CustomizationModal({ item, onClose, onConfirm }) {
   const groups = item?.customization_groups || [];
 
+  // Initialize selections with intelligent defaults for required single-choice groups
   const [selections, setSelections] = useState(() => {
     const initial = {};
     groups.forEach((group) => {
-      initial[group.id] = group.type === "multi" ? [] : null;
+      if (group.type === "single") {
+        // Auto-select first choice if required or available
+        initial[group.id] = group.choices?.[0]?.id || null;
+      } else {
+        initial[group.id] = [];
+      }
     });
     return initial;
   });
-
 
   function toggleChoice(group, choiceId) {
     setSelections((prev) => {
@@ -34,7 +41,7 @@ function CustomizationModal({ item, onClose, onConfirm }) {
   const missingRequired = groups.filter((group) => {
     if (!group.required) return false;
     const selected = selections[group.id];
-    return group.type === "multi" ? selected.length === 0 : !selected;
+    return group.type === "multi" ? (!selected || selected.length === 0) : !selected;
   });
 
   const deltaPaise = useMemo(() => {
@@ -42,7 +49,7 @@ function CustomizationModal({ item, onClose, onConfirm }) {
     groups.forEach((group) => {
       const selected = selections[group.id];
       const selectedIds =
-        group.type === "multi" ? selected : selected ? [selected] : [];
+        group.type === "multi" ? (selected || []) : (selected ? [selected] : []);
 
       selectedIds.forEach((choiceId) => {
         const choice = group.choices.find((c) => c.id === choiceId);
@@ -66,7 +73,7 @@ function CustomizationModal({ item, onClose, onConfirm }) {
       .map((group) => {
         const selected = selections[group.id];
         const selectedIds =
-          group.type === "multi" ? selected : selected ? [selected] : [];
+          group.type === "multi" ? (selected || []) : (selected ? [selected] : []);
 
         if (selectedIds.length === 0) return null;
 
@@ -89,58 +96,86 @@ function CustomizationModal({ item, onClose, onConfirm }) {
   }
 
   return (
-    <div className="modal-overlay" role="dialog" aria-modal="true">
-      <div className="modal-panel">
-        <div className="modal-header">
-          <h2>{item.name}</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
-            ×
+    <div className="cm-overlay" role="dialog" aria-modal="true" onClick={onClose}>
+      <div className="cm-card" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="cm-header">
+          <div className="cm-header-text">
+            {item.category && (
+              <span className="cm-category-badge">{item.category}</span>
+            )}
+            <h2 className="cm-title">{item.name}</h2>
+            {item.description && (
+              <p className="cm-desc">{item.description}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            className="cm-close-btn"
+            onClick={onClose}
+            aria-label="Close customization modal"
+          >
+            <X size={16} />
           </button>
         </div>
 
-        <p className="modal-description">{item.description}</p>
+        {/* Customization Options Body */}
+        <div className="cm-body">
+          {groups.map((group) => (
+            <div className="cm-group" key={group.id}>
+              <div className="cm-group-header">
+                <h3 className="cm-group-title">{group.label}</h3>
+                {group.required ? (
+                  <span className="cm-required-tag">Required</span>
+                ) : (
+                  <span className="cm-optional-tag">Optional</span>
+                )}
+              </div>
 
-        {groups.map((group) => (
-          <div className="customization-group" key={group.id}>
-            <h3>
-              {group.label}
-              {group.required && <span className="required-tag"> (required)</span>}
-            </h3>
+              <div className="cm-choices">
+                {group.choices.map((choice) => {
+                  const selected =
+                    group.type === "multi"
+                      ? (selections[group.id] || []).includes(choice.id)
+                      : selections[group.id] === choice.id;
 
-            <div className="customization-choices">
-              {group.choices.map((choice) => {
-                const selected =
-                  group.type === "multi"
-                    ? (selections[group.id] || []).includes(choice.id)
-                    : selections[group.id] === choice.id;
-
-                return (
-                  <button
-                    type="button"
-                    key={choice.id}
-                    className={`choice-pill ${selected ? "choice-pill-selected" : ""}`}
-                    onClick={() => toggleChoice(group, choice.id)}
-                  >
-                    {choice.label}
-                    {choice.price_delta_paise > 0 &&
-                      ` (+₹${formatPrice(choice.price_delta_paise)})`}
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      type="button"
+                      key={choice.id}
+                      className={`cm-choice-btn ${selected ? "selected" : ""}`}
+                      onClick={() => toggleChoice(group, choice.id)}
+                    >
+                      {selected && <Check size={13} strokeWidth={2.5} />}
+                      <span>{choice.label}</span>
+                      {choice.price_delta_paise > 0 && (
+                        <span className="cm-choice-delta">
+                          (+₹{formatPrice(choice.price_delta_paise)})
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
-        <div className="modal-footer">
-          <strong>₹{formatPrice(unitPricePaise)}</strong>
+        {/* Footer */}
+        <div className="cm-footer">
+          <div className="cm-price-block">
+            <span className="cm-price-label">Customized Price</span>
+            <span className="cm-price-val">₹{formatPrice(unitPricePaise)}</span>
+          </div>
 
           <button
             type="button"
-            className="proceed-button"
+            className="cm-add-btn"
             disabled={missingRequired.length > 0}
             onClick={handleConfirm}
           >
-            Add to cart
+            <Plus size={15} strokeWidth={2.2} />
+            <span>Add to Cart</span>
           </button>
         </div>
       </div>
